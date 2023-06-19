@@ -1,0 +1,30 @@
+
+/* .navbar-container{
+    height:10vh;
+    width:100%;
+    background-color: darkseagreen;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.header-left{
+    margin-left: 10px;
+}
+
+.header-right{
+    margin-right: 10px;
+} */
+
+
+
+@media (min-width: 992px) {
+
+    .navbar-expand-lg .navbar-collapse {
+        display: flex!important;
+        flex-basis: auto;
+        justify-content: flex-end;
+        
+    }
+
+}

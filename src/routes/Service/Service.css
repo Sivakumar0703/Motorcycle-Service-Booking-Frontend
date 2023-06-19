@@ -1,0 +1,160 @@
+
+.service-container{
+    /* background-image: url(https://static.vecteezy.com/system/resources/previews/016/595/012/original/doodle-mechanic-seamless-pattern-background-vector.jpg); */
+    background-color: f5f5f5;
+}
+
+
+.select-bike , .bike-model, .city{
+    background-color: white;
+    /* margin-right: 10px; */
+}
+
+ /* input , select{
+    height:30px;
+    width:100%;
+    /* margin: 8px; 
+ } */
+
+ select{
+    width:100%;
+ } 
+
+ 
+
+ .booking{
+    /* display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 5px; */
+    margin-right: 5px;
+    padding:5px;
+    background-color: #f5f5f5
+ }
+
+/* bike image */
+.bike-img {
+    height:50vh;
+    width:50vw;
+    margin:15px;
+    background-color: aquamarine;
+}
+
+
+
+
+.bike-img > img , .service-img > img  {
+    height:100%;
+    width:100%;
+    object-fit: cover;
+}
+
+.general_service{
+    display: flex;
+    flex-wrap: wrap;
+    background-image: linear-gradient(to right, #33001b, #ff0084);
+    height:auto;
+   width: 100%;
+}
+
+.service-img{
+
+height:inherit;
+width:40vw;
+margin: 0 auto;
+}
+
+.service-list{
+    margin: auto;
+    font-size: 20px;
+    line-height: 2;
+    color:white;
+}
+
+/* booking form */
+
+.details{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+}
+
+.bike-detail-feilds{
+  margin-right:10px;
+  width:inherit;
+}
+
+.booking-form{
+    /* background: rgb(232,48,129);
+    background: linear-gradient(186deg, rgba(232,48,129,1) 0%, rgba(148,187,233,1) 100%); */
+   
+   background-color: #fe616a;
+ display: flex;
+ flex-direction: column;
+ justify-content: space-evenly;
+}
+
+.bike-details{
+    /* background-color: #a1a5d8; */
+   
+    margin: 5px 15px;
+    
+}
+
+.address{
+    /* background-color: rgb(218, 101, 152); */
+    /* display: flex;
+    flex-direction: column;
+    justify-content: space-evenly; */
+    margin: 5px 10px;
+}
+
+.address-box {
+    border:none
+}
+
+input , select{
+    margin-bottom: 5px;
+    border-radius: 5px;
+}
+
+.input{
+    width:100%;
+}
+
+.booking-form-img{ /* book now img */
+    height:auto;
+    width:100vw;
+    margin:auto;
+}
+
+
+ .book{
+    height:inherit;
+    width:inherit;
+ }
+
+
+
+
+@media (min-width: 576px) { 
+
+    .booking-form{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        
+    }
+
+    .bike-detail-feilds{
+        margin-right:10px;
+        width:100%;
+      }
+
+      .booking-form-img{ /* book now img */
+        height:auto;
+        width:40vw;    
+    }
+ }
