@@ -38,7 +38,7 @@ background: linear-gradient(186deg, rgba(232,48,129,1) 0%, rgba(148,187,233,1) 1
 form{
     display: flex;
     flex-direction: column;
-   
+    background-color: transparent;
    
     align-items: center;
 }

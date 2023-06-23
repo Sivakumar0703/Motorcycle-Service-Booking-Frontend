@@ -16,12 +16,14 @@ import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import Mininav from '../../components/Navigation/Mininav';
+import Booking from '../../components/Booking/Booking';
 
 // general service - payment | repair service - booking
-
+/*
 const registerSchemaValidation = yup.object({
-    userName: yup.string().min(3, 'name should have minimum 3 character').required("Enter Your Name"),
+    name: yup.string().min(3, 'name should have minimum 3 character').required("Enter Your Name"),
     address1: yup.string().required("Enter address1"),
     mobile: yup.string().matches(/^[0-9]{10}/, "Enter valid mobile number").required("Enter Mobile Number"),
     email: yup.string().email().required("Enter Email"),
@@ -32,19 +34,23 @@ const registerSchemaValidation = yup.object({
     time: yup.string().required('Select time slot'),
 
 })
-
+*/
 
 const Repair = () => {
 
-    const user = localStorage.getItem('user');
+    const user = JSON.parse(localStorage.getItem('user')) ;
+    const url = 'http://localhost:8000/bookings/repair/service/addbooking' ;
+    
     // console.log(user);
-    const { bikes } = BikeState([]);
+    const { bikes , price } = BikeState();
     const timeslot = ["09:00", "11:00", "14:00", "16:00"];
     const [orderId, setOrderId] = useState();
-    const price = 100;
+   // const price = 100;
     const bikeAry = [];
     let brand = [];
+    //const today = dayjs().format('DD/MM/YYYY');
     const today = dayjs();
+    console.log(today)
 
     const[disable , setDisable] = useState(false)
 
@@ -56,30 +62,34 @@ const Repair = () => {
     const [date, setDate] = useState(today);
 
     // formik function
+    /*
 
     const { values, handleChange, handleSubmit, handleBlur, errors, touched } = useFormik({
         initialValues: {
             name: "",
-            address1: "",
             mobile: "",
             email: "",
+            bike: '',
+            model: '',
+            address1: "",
             address2: "",
             pincode: "",
             serviceType: "repair service",
-            bike: '',
-            model: '',
+            serviceDate: dayjs(date).format('DD/MM/YYYY'),
             time: '',
-            serviceDate: date,
-            userId: localStorage.getItem('user').id
+            
 
         },
 
         validationSchema: registerSchemaValidation,
-        onSubmit: (bookingData) => {
-            addbooking(bookingData)
+        // onSubmit: (bookingData) => {
+        //     addbooking(bookingData)
+            onSubmit: (bookingData) => {
+                handleSubmitt(bookingData)
         }
 
     })
+    */
 
     function addbooking(bookingData){
         axios.post('http://localhost:8000/bookings/repair/service/addbooking', { // product & user detail to backend for storing in db
@@ -95,10 +105,10 @@ const Repair = () => {
     //    mobile: values.mobile,
     //    pincode: values.pincode,
     //    userId: localStorage.getItem('user').id
-    bookingData
+    ...bookingData, homeService : true, paid : price?.repairServicePrice ,userId: user.id
    })
 
-   handleSubmitt();
+  // handleSubmitt();
     }
 
 
@@ -114,12 +124,13 @@ const Repair = () => {
     }
 
 
-
+    
     // useEffect is used to get order id from razorpay
+    /*
     useEffect(() => {
         async function getData() {
             try {
-                price && await axios.post('http://localhost:8000/razorpay/order', { amount: price }).then((res) => {
+                price && await axios.post('http://localhost:8000/razorpay/order', { amount:  price.repairServicePrice }).then((res) => {
                     console.log('response from backend to get order id', res, res.data, res.data.orderId)
                     setOrderId(res.data.orderId)
                     console.log(res.data.orderId)
@@ -130,15 +141,17 @@ const Repair = () => {
         }
         getData();
     }, [])
+    */
 
-
+/*
     useEffect(()=>{
             if(values.bike.length > 2){
                 setDisable(true)
             }
-    },[values.model])
+    },[values.model]) */
 
     // for payment verification
+    /*
     function verify(payment, order, signature) {
         try {
             axios.post('http://localhost:8000/razorpay/api/payment/verify', { paymentId: payment, orderId: order, signature: signature }).then(res => console.log('payment verification data sent', res))
@@ -148,16 +161,19 @@ const Repair = () => {
             console.log('error in sending payment verification data cart.js', error)
         }
     }
+*/
 
     // razorpay payment integration
-    const handleSubmitt = () => {
+     /*
+    const handleSubmitt = (bookingData) => {
        
         // e.preventDefault();
 
         var options = {
             key: "rzp_test_f3Zt6s7fSoiZSu",
             secret: "ObqLEeSpRqphtxBZI88ju0E7",
-            amount: price * 100,
+           // amount: price * 100,
+            amount: price && price.repairServicePrice * 100,
             currency: "INR",
             name: "Online Motocycle Service Booking",
             description: 'service',
@@ -170,7 +186,7 @@ const Repair = () => {
                     verify(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature)
                     toast.success("Payment Successful");
                     toast.success("Booking successful");
-                   
+                    addbooking(bookingData)
                     // navigate('/dummy')
                 }
                 // verfication ends
@@ -193,6 +209,7 @@ const Repair = () => {
         pay.open()
 
     }
+    */
 
 //    function checkModel(){
 //     if(values.bike !== ''){
@@ -245,16 +262,16 @@ const Repair = () => {
             </div>
             </div>
 
-           
+           <Booking url={url} amount={price?.repairServicePrice} serviceType={"Repair Service"} userId={user.id} homeService={true}/>
 
 
-            <div className='form'>
+            {/* <div className='form'>
                 <form onSubmit={handleSubmit}>
                     <div className='form-filling row'>
                         <div className='left col-5'>
 
-                            <TextField id="outlined-basic1" required label="USER NAME" onBlur={handleBlur} variant="outlined" fullWidth margin="normal" name="userName" value={values.userName} onChange={handleChange} /> <br />
-                            {touched.userName && errors.userName ? <p style={{ color: "red" }}>{errors.userName}</p> : ""}
+                            <TextField id="outlined-basic1" required label="USER NAME" onBlur={handleBlur} variant="outlined" fullWidth margin="normal" name="name" value={values.name} onChange={handleChange} /> <br />
+                            {touched.name && errors.name ? <p style={{ color: "red" }}>{errors.name}</p> : ""}
 
                             <TextField id="outlined-basic3" required label="MOBILE NUMBER" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="mobile" value={values.mobile} onChange={handleChange} /> <br />
                             {touched.mobile && errors.mobile ? <p style={{ color: "red" }}>{errors.mobile}</p> : ""}
@@ -319,14 +336,18 @@ const Repair = () => {
                             />
                         </LocalizationProvider> */}
 
-                            <LocalizationProvider dateAdapter={AdapterDayjs} >
+                            {/* <LocalizationProvider dateAdapter={AdapterDayjs} >
+                            <DemoContainer components={['DatePicker']} >
                                 <DatePicker
                                     label='Select Date'
                                     value={date}
-                                    onChange={(e) => setDate(`${e.$D}/${e.$M + 1}/${e.$y}`)}
+                                    // onChange={(e) => setDate(`${e.$D}/${e.$M + 1}/${e.$y}`)}
+                                   // onChange={(e) => setDate(dayjs(e).format('DD/MM/YYYY'))}
+                                    onChange={(e) => setDate(e)}
                                     disablePast
                                     className='mt-3 mb-2'
                                 />
+                                </DemoContainer>
                             </LocalizationProvider> <br/>
 
 
@@ -335,16 +356,17 @@ const Repair = () => {
                                 error={touched.time && Boolean(errors.time)} helperText={touched.time && errors.time} >
                                 <MenuItem key={""} value={""}> --select time slot--  </MenuItem>
                                 {timeslot.map((i) => <MenuItem value={i} key={i}> {i} </MenuItem>)}
-                            </TextField> <br/> </div> </div>
+                            </TextField> <br/> </div> </div> */}
 
-                    <div className='form-btn'>
-                         <button className='btn btn-primary mb-3 register-btn' type='submit' onClick={handleSubmit} >BOOK NOW</button>  {/* <Tooltip title="hello" placement="right" arrow > <InfoIcon />  </Tooltip>    */}
-                    </div>
+                    {/* <div className='form-btn'>
+                         <button className='btn btn-primary mb-3 register-btn' type='submit' onClick={handleSubmit} >BOOK NOW</button> 
+                    </div> */}
+                     {/* <Tooltip title="hello" placement="right" arrow > <InfoIcon />  </Tooltip>    */}
 
-                </form>
+                {/* </form> */}
 
 
-            </div>
+            {/* </div> */} 
 
            
 

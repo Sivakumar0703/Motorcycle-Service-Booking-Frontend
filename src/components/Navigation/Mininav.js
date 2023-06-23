@@ -14,23 +14,23 @@ const Mininav = () => {
 
         <div className='collapse navbar-collapse' id='navv'>
             <ul className='navbar-nav ml-auto'>
-                <li className='nav-item active'>
+                <li className='nav-item '>
                     <a href="/" className='nav-link'> Home </a>
                 </li>
 
-                <li className='nav-item'>
+                <li className='nav-item '>
                     <a href="#" className='nav-link'> Contact </a>
                 </li>
 
-                <li className='nav-item'>
+                <li className='nav-item '>
                     <a href="/service" className='nav-link'> Service </a>
                 </li>
 
-                <li className='nav-item'>
-                    <a href="/washing" className='nav-link'> Water Wash </a>
+                <li className='nav-item '>
+                    <a href="/washing" className='nav-link '> Water Wash </a>
                 </li>
 
-                <li className='nav-item'>
+                <li className='nav-item '>
                     <a href="/repair" className='nav-link'> Repair </a>
                 </li>
 

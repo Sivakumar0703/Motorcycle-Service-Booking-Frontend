@@ -1,0 +1,23 @@
+
+.add-new-bike{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.add-bike-heading{
+    font-size: large;
+    font-weight: 800;
+    text-align: left;
+}
+
+/* stylings for admin price page */
+
+.price-list{
+    margin: 10px 15px;
+}
+
+.price-list > input{
+    margin: 5px 5px;
+}

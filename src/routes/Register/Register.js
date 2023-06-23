@@ -33,6 +33,7 @@ const Register = () => {
   const navigate = useNavigate()
 
 
+
   // formik function
 
   const { values, handleChange, handleSubmit, handleBlur, errors, touched } = useFormik({
@@ -45,16 +46,10 @@ const Register = () => {
     },
 
     validationSchema: registerSchemaValidation,
-    onSubmit : (newuser) => signup(newuser)
+     onSubmit : (newuser) => signup(newuser)
+  
 
   })
-
-
-
-
-
-
-
 
 
 
@@ -86,7 +81,7 @@ const Register = () => {
 
   return (
 
-    <div className='container row signup-registration col-12' >
+    <div className='container row signup-registration col-12' > 
 
 
 

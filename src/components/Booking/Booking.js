@@ -46,28 +46,37 @@ var registerSchemaValidation = yup.object({
     time: yup.string().required('Select time slot'),
 })
 
-const Booking = ({amount , url , serviceType}) => {
+const Booking = ({ amount, url, serviceType, homeService, userId }) => {
 
     const user = JSON.parse(localStorage.getItem('user'));
-    
-   
+
+
     const { bikes } = BikeState([]);
     const timeslot = ["09:00", "11:00", "14:00", "16:00"];
     const [orderId, setOrderId] = useState();
+    console.log(orderId, 'order id')
     const price = amount;
+    console.log(price, 'price')
     const bikeAry = [];
     let brand = [];
     const today = dayjs();
-    
-    
+
+
 
     const [disable, setDisable] = useState(false)
 
     const [date, setDate] = useState(today);
-    const today_format =`${date.$D}/${date.$M + 1}/${date.$y}` ;
+    //const today_format =`${date.$D}/${date.$M + 1}/${date.$y}` ;
+    const today_format = dayjs(date).format('DD/MM/YYYY');
+    console.log(today_format)
 
     //checkbox
-    const[checked , setChecked] = useState(true)
+    const [checked, setChecked] = useState(true)
+    //const[detail , setDetail] = useState()
+   // console.log(detail)
+   // console.log({...detail})
+
+    //const[touch , setTouch] = useState(true)
 
     // formik function
 
@@ -83,19 +92,22 @@ const Booking = ({amount , url , serviceType}) => {
             bike: '',
             model: '',
             time: '',
-            serviceDate: today_format,
-            paid:price
-         
+            serviceDate: dayjs(date).format('DD/MM/YYYY'),
+            //  paid:price && price,
+            //  homeService:homeService,
+            //  userId:userId
+
 
         },
 
-        validationSchema : checked ?  HomeServiceRegisterSchemaValidation : registerSchemaValidation ,
-        onSubmit: (bookingData) => {
-            handleSubmitt(bookingData)
+        validationSchema: checked ? HomeServiceRegisterSchemaValidation : registerSchemaValidation,
+        onSubmit: (bookingData) => { getData(bookingData)
+            
+          
         }
 
     })
-// product & user detail to backend for storing in db
+    // product & user detail to backend for storing in db
     // function addbooking(bookingData) {
     //     axios.post('http://localhost:8000/bookings/water/wash/service/addbooking', {...bookingData , homeService:checked , userId: user.id})
     //     console.log({...bookingData, homeService:checked , userId: user.id});
@@ -113,23 +125,37 @@ const Booking = ({amount , url , serviceType}) => {
         return array.filter((item, index) => array.indexOf(item) === index)
     }
 
-
-
-    // useEffect is used to get order id from razorpay
-    useEffect(() => {
-        async function getData() {
-            try {
-                price && await axios.post('http://localhost:8000/razorpay/order', { amount: price }).then((res) => {
-                    console.log('response from backend to get order id', res, res.data, res.data.orderId)
-                    setOrderId(res.data.orderId)
-                    console.log(res.data.orderId)
-                })
-            } catch (error) {
-                console.log(error);
+            // useEffect is used to get order id from razorpay
+            async function getData(bookingData) {
+                try {
+    
+                    console.log('order id function called => price', price)
+    
+                  price &&  console.log('order id function inside if  => price', price)
+                    await axios.post('http://localhost:8000/razorpay/order', { amount:price && price }).then((res) => {
+                        console.log('response from backend to get order id', res, res.data, res.data.orderId)
+                        setOrderId(res.data.orderId)
+                        console.log('setting order id : ', res.data.orderId)
+                        handleSubmitt(res.data.orderId , bookingData)
+    
+                    })
+    
+                } catch (error) {
+                    console.log(error);
+                }
             }
-        }
-        getData();
-    }, [])
+
+
+
+
+
+    // useEffect(() => {
+    //     console.log('use effect called')
+         
+    //         getData();
+          
+    // }, [])
+
 
     useEffect(() => {
         if (values.bike.length > 2) {
@@ -138,25 +164,26 @@ const Booking = ({amount , url , serviceType}) => {
     }, [values.model])
 
     // for payment verification
-  async  function verify(payment, order, signature , bookingData) {
+    async function verify(payment, order, signature , bookingData) {
         try {
-          await  axios.post('http://localhost:8000/razorpay/api/payment/verify', { paymentId: payment, orderId: order, signature: signature }).then(res => {
-                 
-          if( res.data.signatureIsValid === "true"){
-            //  user booking detail to backend for storing in db
-          axios.post(url, {...bookingData , homeService:checked , userId: user.id})
-            console.log({...bookingData, homeService:checked , userId: user.id});
-            toast.success("Payment Successful");
-             toast.success("Booking successful");
-        } else {
-            toast.error("Payment Failed")
-        }
+            console.log('order id : ', order, ',', 'signature : ', signature)
+            await axios.post('http://localhost:8000/razorpay/api/payment/verify', { paymentId: payment, orderId: order, signature: signature }).then(res => {
 
-          })
-          // setVerification(res.data.signatureIsValid))
-          //  console.log('payment & order ', payment, order);
-          
-            
+                if (res.data.signatureIsValid === "true") {
+                    //  user booking detail to backend for storing in db
+                    axios.post(url, { ...bookingData, homeService: checked, userId: user.id, paid: price })
+                    console.log({ ...bookingData, homeService: checked, userId: user.id });
+                    toast.success("Payment Successful");
+                    toast.success("Booking successful");
+                } else {
+                    toast.error("Payment Failed")
+                }
+
+            })
+            // setVerification(res.data.signatureIsValid))
+            //  console.log('payment & order ', payment, order);
+
+
 
         } catch (error) {
             console.log('error in sending payment verification data cart.js', error)
@@ -164,10 +191,13 @@ const Booking = ({amount , url , serviceType}) => {
     }
 
     // razorpay payment integration
-    const handleSubmitt = (bookingData) => {
+    const handleSubmitt = async (id , bookingData) => {
+         //await  getData();
+        
 
-        // e.preventDefault();
 
+        console.log(orderId && orderId, 'before razorpay starts')
+      
         var options = {
             key: "rzp_test_f3Zt6s7fSoiZSu",
             secret: "ObqLEeSpRqphtxBZI88ju0E7",
@@ -175,13 +205,14 @@ const Booking = ({amount , url , serviceType}) => {
             currency: "INR",
             name: "Online Motocycle Service Booking",
             description: 'service',
-            order_id: orderId,
+            order_id: id,
             handler: function (response) {
+                console.log('container razorpay order id from be', response)
 
                 console.log("Payment_ID : ", response.razorpay_payment_id, '|', 'order_id : ', response.razorpay_order_id, '|', 'signature : ', response.razorpay_signature)
                 // payment verification
                 if (response.razorpay_payment_id) {
-                    verify(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature , bookingData)
+                    verify(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature,bookingData )
                     // toast.success("Payment Successful");
                     // toast.success("Booking successful");
 
@@ -195,13 +226,11 @@ const Booking = ({amount , url , serviceType}) => {
                 email: JSON.parse(localStorage.getItem('user')).email,
                 contact: JSON.parse(localStorage.getItem('user')).mobile
             },
-            notes: {
-                address: "online rental office address" // company address
-            },
             theme: {
                 color: "#3399cc"
             }
         };
+       
 
 
         var pay = new window.Razorpay(options); // if payment is successful
@@ -209,13 +238,13 @@ const Booking = ({amount , url , serviceType}) => {
 
     }
 
-// check box
+    // check box
 
 
-function checkbox(val){
-    console.log(val)
-    setChecked(val)
-}
+    function checkbox(val) {
+        console.log(val)
+        setChecked(val)
+    }
 
 
 
@@ -227,22 +256,22 @@ function checkbox(val){
 
 
     return (
-        <div className='booking-form'> 
+        <div className='bookings-form'>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} style={{backgroundColor:'transparent'}}>
                 <div className='form-filling row'>
                     <div className='left col-4'>
 
-                        <TextField id="outlined-basic1" required label="USER NAME" onBlur={handleBlur} variant="outlined" fullWidth margin="normal" name="name" value={values.name} onChange={handleChange} /> 
+                        <TextField id="outlined-basic1" required label="USER NAME" onBlur={handleBlur} variant="outlined" fullWidth margin="normal" name="name" value={values.name} onChange={handleChange} />
                         {touched.name && errors.name ? <p className="error-msg" style={{ color: "red" }}>{errors.name}</p> : ""}
 
-                        <TextField id="outlined-basic3" required label="MOBILE NUMBER" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="mobile" value={values.mobile} onChange={handleChange} /> 
+                        <TextField id="outlined-basic3" required label="MOBILE NUMBER" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="mobile" value={values.mobile} onChange={handleChange} />
                         {touched.mobile && errors.mobile ? <p className="error-msg" style={{ color: "red" }}>{errors.mobile}</p> : ""}
 
-                        <TextField id="outlined-basic2" required label="EMAIL" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="email" value={values.email} onChange={handleChange} /> 
-                        {touched.email && errors.email ? <p  className="error-msg"style={{ color: "red" }}>{errors.email}</p> : ""}
+                        <TextField id="outlined-basic2" required label="EMAIL" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="email" value={values.email} onChange={handleChange} />
+                        {touched.email && errors.email ? <p className="error-msg" style={{ color: "red" }}>{errors.email}</p> : ""}
 
-                        <TextField id="outlined-basic2" required label="House No & Street Name" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="address1" value={values.address1} onChange={handleChange} disabled={!checked} /> 
+                        <TextField id="outlined-basic2" required label="House No & Street Name" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="address1" value={values.address1} onChange={handleChange} disabled={!checked} />
                         {touched.address1 && errors.address1 ? <p className="error-msg" style={{ color: "red" }}>{errors.address1}</p> : ""}
 
                         <TextField id="outlined-basic4" required label="City/Village" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="address2" value={values.address2} onChange={handleChange} disabled={!checked} />
@@ -250,13 +279,13 @@ function checkbox(val){
 
                     <div className='right col-4'>
 
-                        <TextField id="outlined-basic5" required label="Pincode" variant="outlined" fullWidth margin="normal" name="pincode" value={values.pincode} onChange={handleChange} disabled={!checked} /> 
+                        <TextField id="outlined-basic5" required label="Pincode" variant="outlined" fullWidth margin="normal" name="pincode" value={values.pincode} onChange={handleChange} disabled={!checked} />
                         {touched.pincode && errors.pincode ? <p className="error-msg" style={{ color: "red" }}>{errors.pincode}</p> : ""}
 
 
 
                         <TextField select id="Brand" label="Brand" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="bike" value={values.bike} onChange={handleChange}
-                            error={touched.bike && Boolean(errors.bike)} helperText={touched.bike && errors.bike} disabled={disable}  > 
+                            error={touched.bike && Boolean(errors.bike)} helperText={touched.bike && errors.bike} disabled={disable}  >
 
                             <MenuItem key={""} value={""} disabled> --select brand--  </MenuItem>
 
@@ -264,7 +293,7 @@ function checkbox(val){
                         </TextField>
 
                         <TextField select id="Model" label="Model" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="model" value={values.model} onChange={handleChange}
-                            error={touched.model && Boolean(errors.model)} helperText={touched.model && errors.model} > 
+                            error={touched.model && Boolean(errors.model)} helperText={touched.model && errors.model} >
                             <MenuItem key={""} value={""} disabled> --select brand--  </MenuItem>
                             {bikes && bikes.map((i) => values.bike && values.bike == i.bikeCompany ? <MenuItem value={i.model} key={i._id}> {i.model} </MenuItem> : '')}
 
@@ -279,12 +308,12 @@ function checkbox(val){
                                 onChange={(e) => setDate(e)}
                                 disablePast
                                 className='mt-3 mb-2'
-                               fullWidth
-                                
+                                fullWidth
+
                             />
                         </LocalizationProvider>  {console.log(today_format)}
 
-{/* `${e.$D}/${e.$M + 1}/${e.$y}` */}
+                        {/* `${e.$D}/${e.$M + 1}/${e.$y}` */}
 
                         <TextField select id="timeslot" label="Time-Slot" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="time" value={values.time} onChange={handleChange}
                             error={touched.time && Boolean(errors.time)} helperText={touched.time && errors.time} >
@@ -299,7 +328,7 @@ function checkbox(val){
                     inputProps={{ 'aria-label': 'controlled' }}
                 /> */}
 
-<FormControlLabel control={<Checkbox onChange={(e)=>checkbox(e.target.checked)} checked={checked} />} label="Home Service" />
+                <FormControlLabel control={<Checkbox onChange={(e) => checkbox(e.target.checked)} checked={checked} />} label="Home Service" />
 
                 <div className='form-btn'>
                     <button className='btn btn-primary mb-3 register-btn' type='submit' onClick={handleSubmit} >BOOK NOW</button>   {/* <Tooltip title="hello" placement="right" arrow > <InfoIcon />  </Tooltip>    */}

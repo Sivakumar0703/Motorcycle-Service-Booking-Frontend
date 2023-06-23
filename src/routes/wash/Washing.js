@@ -2,10 +2,15 @@ import React from 'react'
 import "../wash/Washing.css"
 import Booking from '../../components/Booking/Booking'
 import Mininav from '../../components/Navigation/Mininav';
+import { BikeState } from '../../context/Context';
 
 const Washing = () => {
 
-  const amount = 499;
+  const {price} = BikeState();
+  console.log(price)
+
+  const amount = price &&  price.washServicePrice;
+  console.log(amount)
   const serviceType = "Water Wash";
   const url = "http://localhost:8000/bookings/water/wash/service/addbooking";
 

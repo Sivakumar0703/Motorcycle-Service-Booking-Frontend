@@ -7,21 +7,15 @@ import Payment from '../payment/Payment';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { toast } from 'react-toastify'
+import Mininav from '../../components/Navigation/Mininav';
+import dayjs from 'dayjs';
 
+const Services = () => {
 
-const Service = () => {
-
-
-    const { bikes , price } = BikeState()
+    const { bikes, price } = BikeState()
 
     const bikeAry = [];
     let brand = [];
-
-    //  const data = ["one", "two", "three", "four", "five"];
-    //  const [value, setValue] = useState('');
-    //  const[show , setShow] = useState(false);
-    //  const[check , setCheck] = useState('')
-    //const city = ["Chennai", "Madurai", "Tirchy", "Coimbatore", "Thirunelveli"]
 
     const [name, setName] = useState('');
     const [mobile, setMobile] = useState('');
@@ -38,15 +32,12 @@ const Service = () => {
     const [district, setDistrict] = useState('');
     const [pincode, setPincode] = useState('');
 
-
     // disable past date from calendar
     let current_date = new Date();
     let current_time = new Date().toISOString()
-    //console.log(current_date , ',' ,current_time)
     let datee = current_date.getDate(); // 2,5,10,15...
     let month = current_date.getMonth() + 1; // 6,7,10,12
     let year = current_date.getUTCFullYear(); // 2023
-    //console.log(datee , month , year)
 
     if (month < 10) {
         month = "0" + month; // 03,04,05...
@@ -55,8 +46,9 @@ const Service = () => {
         datee = "0" + datee; // 02,03,07
     }
 
+
     let minDate = `${year}-${month}-${datee}`; // yyyy-mm-dd
-    // console.log(`${datee}-${month}-${year}`)
+
 
     const [date, setDate] = useState(minDate); // yyyy-mm-dd
 
@@ -71,21 +63,18 @@ const Service = () => {
     // order id
     const [orderId, setOrderId] = useState();
 
-// on click book now
+// get all brands without duplicates
+    bikes && bikes.map((i) => bikeAry.push(i.bikeCompany)) 
+    brand = unique(bikeAry)
+
+    // on click book now
     function booknow(e) {
         e.preventDefault();
         handleShow();
         customerData();
     }
 
-
-
-
-
     async function customerData() {
-
-
-
         const customer = {
             name,
             mobile,
@@ -93,33 +82,20 @@ const Service = () => {
             register,
             bike,
             model,
-           
-            
-            serviceType:'regular service'
+            serviceDate:dayjs(date).format('DD/MM/YYYY'),
+
+
+            serviceType: 'regular service'
         }
         console.log(customer);
-       
-
         try {
             let user_data = await axios.post('http://localhost:8000/bookings/general/service/addbooking', customer)
             console.log(user_data);
-           
+
         } catch (error) {
             console.log('error in posting user data', error)
         }
-
-        // bikes.map( (i) => { i.bike === bike && i.model === model ? setDetail(i) : setDetail('')})
-
-
-
     }
-
-// let ccLessererThan125 = 125; // put this in context and make it accessable from admin page to change its value => setvalues pass it to admin page 
-// let cc125plus = 610;
-// let ccGreaterThan200 = 699;
-
-
-
 
     useEffect(() => {
         bikes && bikes.map((i) => {
@@ -129,10 +105,10 @@ const Service = () => {
                     console.log('cc less than or equal to 125', i.cc, setPricee(price && price.generalServicePrice.general1))
                 } else if (i.cc >= 125 && i.cc < 200) {
                     console.log('cc less than or equal to 200', i.cc, setPricee(price && price.generalServicePrice.general2))
-                   // console.log('cc less than or equal to 200', i.cc, setPrice(610))
+                    // console.log('cc less than or equal to 200', i.cc, setPrice(610))
                 } else {
                     console.log('cc greater than 200', i.cc, setPricee(price && price.generalServicePrice.general3))
-                   // console.log('cc greater than 200', i.cc, setPrice(699))
+                    // console.log('cc greater than 200', i.cc, setPrice(699))
                 }
                 setDetail(i)
 
@@ -140,77 +116,28 @@ const Service = () => {
         })
     }, [model])
 
-
-    /*        
-            // redirect to payment section
-            function confirmPayment(data , price){
-                <Payment detail={data} price={price}/>
-                 console.log('pay' , data,price)
-                 handleClose();
-            } */
-
-    // function checklist(e){
-    //    console.log(e)
-    //         count = count + parseInt(e)
-    //      if(count === 1){
-    //         console.log(count)
-    //         setShow('before increment',true)
-    //         count++;
-    //        console.log('increment' , count)
-    //      } else {
-    //         console.log(count)
-    //         setShow('before decrement',false)
-    //         count = count - 3
-    //         console.log('decrement' , count)
-    //      }
-    // }
-
-
-
     // to remove duplicates in array
     function unique(array) {
         return array.filter((item, index) => array.indexOf(item) === index)
-        
     }
-   
+    
 
     // razor pay area
     useEffect(() => {
-
-
         async function getData() {
 
             try {
-                // {console.log(price)}
-
                 // razor - to get order id        
                 price && await axios.post('http://localhost:8000/razorpay/order', { amount: pricee }).then((res) => {
                     console.log('response from backend to get order id', res, res.data, res.data.orderId)
                     setOrderId(res.data.orderId)
                     console.log(res.data.orderId)
+
+                     
                 })
-
-
-
-                // data to payment collection in database
-                /*      detail &&   await axios.post('http://localhost:8000/payment', { // product & user detail to backend for storing in db
-                      brand: detail.bikeCompany,
-                      model: detail.model,
-                      registration: register,
-                      customerName: JSON.parse(localStorage.getItem('user')).userName,
-                      date: date,
-                      price: price,
-                      orderId: orderId,
-                  }) */
-                // console.log(payment, 'data to db');
-
-
-
             } catch (error) {
                 console.log(error)
-
             }
-
         }
         getData();
     }, [pricee])
@@ -229,7 +156,7 @@ const Service = () => {
                 date: date,
                 price: pricee,
                 orderId: orderId,
-                serviceType:'regular service',
+                serviceType: 'regular service',
                 name,
                 mobile
             })
@@ -238,9 +165,6 @@ const Service = () => {
             console.log('error in sending payment verification data cart.js', error)
         }
     }
-
-    // key: rzp_test_f3Zt6s7fSoiZSu
-    //secret:  ObqLEeSpRqphtxBZI88ju0E7
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -259,8 +183,8 @@ const Service = () => {
                 // payment verification
                 if (response.razorpay_payment_id) {
                     verify(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature)
-                      toast.success("Payment Successful");
-                      toast.success("Booking successful")
+                    toast.success("Payment Successful");
+                    toast.success("Booking successful")
                     // navigate('/dummy')
                 }
                 // verfication ends
@@ -284,53 +208,15 @@ const Service = () => {
 
     }
 
-    // razorpay ends
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
     return (
-        <div className='service-container'> 
+        <div  >
+            <Mininav />
 
-            {bikes && bikes.map((i) => bikeAry.push(i.bikeCompany))}
-            {brand = unique(bikeAry)}
-            
-          
-            <div className='booking-form'>
 
+            <div className='booking-form  '>
                 <div className='bike-details ' > <form method='get' action=''>
                     <h2> Bike Details </h2>
                     <div className='bike-detail-feilds'> <input className='input' placeholder='Name' value={name} onChange={e => setName(e.target.value)} required /> </div>
@@ -351,26 +237,13 @@ const Service = () => {
 
                     </select> </div>
                     <div>  <input className='input' id="calendar" type="date" value={date} min={minDate} onChange={e => setDate(e.target.value)} required /> </div>
-                    {/* <div>  <input type="checkbox" id="checkbox" value="1"  ></input> Pick up and drop   */}
 
+                    <div>  <button className='btn btn-success' type="submit" onClick={booknow}> BOOK NOW</button> </div>
+                </form>
+                </div>
 
-
-                    {/* <div className='address ' >
-                    <h2> Address </h2>
-                    <div> <input className='address-box' placeholder='House No/Flat No' value={houseNumber} onChange={e => setHouseNumber(e.target.value)} required /> </div>
-                    <div> <input className='address-box' placeholder=' Street Name' value={street} onChange={e => setStreet(e.target.value)} required /> </div>
-                    <div> <input className='address-box' placeholder='City/Village' value={city} onChange={e => setCity(e.target.value)} required /> </div>
-                    <div> <input className='address-box' placeholder='District' value={district} onChange={e => setDistrict(e.target.value)} required /> </div>
-                    <div> <input className='address-box' placeholder='Pincode' value={pincode} onChange={e => setPincode(e.target.value)} required /> </div>
-                      </div> */}
-
-
-                       {/* </div> */}
-                         <div>  <button className='btn btn-success' type="submit" onClick={booknow}> BOOK NOW</button> </div>
-                          </form>   
-                           </div>
-                         {/* modal */}
-                        {detail &&
+                {/* modal */}
+                {detail &&
                     <div>
                         <Modal show={show} onHide={handleClose} >
                             <Modal.Header >
@@ -389,12 +262,9 @@ const Service = () => {
 
                             </Modal.Footer>
                         </Modal>
+
                     </div>
                 }
-
-
-
-
 
                 <div className='booking-form-img'>
 
@@ -402,19 +272,11 @@ const Service = () => {
                 </div>
             </div>
 
-
-            {/* {console.log(houseNumber , street , city , district , pincode)}
-{console.log(name , mobile , register , date)}
-{console.log(check)} */}
-            {/* {console.log(date , 'date')} */}
-
-
             {/* bike image div */}
 
             <div className='bike-img'>
                 {detail && detail.model === model ? <img src={detail.image} alt='bike' /> : <img src='' alt='bike' />}
             </div>
-
 
             {/* service detail list */}
 
@@ -436,7 +298,6 @@ const Service = () => {
 
             </div>
 
-
             {/*  */}
 
             <div> hello
@@ -445,29 +306,8 @@ const Service = () => {
 
 
 
-
-
-
-
-
-
-
         </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     )
 }
 
-export default Service
+export default Services
