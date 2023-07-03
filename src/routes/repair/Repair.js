@@ -39,7 +39,7 @@ const registerSchemaValidation = yup.object({
 const Repair = () => {
 
     const user = JSON.parse(localStorage.getItem('user')) ;
-    const url = 'http://localhost:8000/bookings/repair/service/addbooking' ;
+    const url = 'http://localhost:8080/bookings/repair/service/addbooking' ;
     
     // console.log(user);
     const { bikes , price } = BikeState();
@@ -92,7 +92,7 @@ const Repair = () => {
     */
 
     function addbooking(bookingData){
-        axios.post('http://localhost:8000/bookings/repair/service/addbooking', { // product & user detail to backend for storing in db
+        axios.post('http://localhost:8080/bookings/repair/service/addbooking', { // product & user detail to backend for storing in db
     //     brand : values.company,
     //      model:values.model,
     //    customerName: user.userName,

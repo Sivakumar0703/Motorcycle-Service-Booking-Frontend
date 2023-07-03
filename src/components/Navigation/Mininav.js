@@ -19,7 +19,7 @@ const Mininav = () => {
                 </li>
 
                 <li className='nav-item '>
-                    <a href="#" className='nav-link'> Contact </a>
+                    <a href="/contact" className='nav-link'> Contact </a>
                 </li>
 
                 <li className='nav-item '>

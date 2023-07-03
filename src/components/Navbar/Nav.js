@@ -36,8 +36,8 @@ function CollapsibleExample() {
           {/*  */}
           {user ? 
           <NavDropdown title={user.userName}  id="collasible-nav-dropdown">
-            <NavDropdown.Item href="#">Home</NavDropdown.Item>
-            <NavDropdown.Item href="#">
+            <NavDropdown.Item href="/">Home</NavDropdown.Item>
+            <NavDropdown.Item href="/profile">
               Profile
             </NavDropdown.Item>
             <NavDropdown.Item href="#" onClick={logout}>Logout</NavDropdown.Item>

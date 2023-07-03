@@ -9,19 +9,23 @@ import { Button } from '@mui/material'
 import '../admin/Admin.css'
 import Table from 'react-bootstrap/Table';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import dayjs from 'dayjs'
+import moment from 'moment/moment'
+import Adminnav from './Adminnav'
 
 const Admin = () => {
 
     const { bikes } = BikeState();
 
     const today = new Date
+    const current_date = dayjs(today).format('YYYY-MM-DD');
     const date = today.getDate().toString();
     const month = today.getMonth() + 1;
     const year = today.getFullYear().toString();
     // console.log(`${date}/${month}/${year}`)
-    const current_date = `${date}/${month}/${year}`;
+    //const current_date = `${date}/${month}/${year}`;
 
-    console.log(current_date , 'current date')
+    //console.log(current_date , 'current date')
 
     // make new collection and store the value , update it though api call;get values in context and pass it
     // const[price1 , setPrice1 ] = useState(550);
@@ -30,10 +34,11 @@ const Admin = () => {
     // console.log(price1 , price2,price3)
 
     // adding new bike
-    const [bikeCompany, setBikeCompany] = useState('');
-    const [model, setModel] = useState('');
-    const [cc, setCc] = useState('');
-    const [image, setImage] = useState('');
+    // const [bikeCompany, setBikeCompany] = useState('');
+    // const [model, setModel] = useState('');
+    // const [cc, setCc] = useState('');
+    // const [image, setImage] = useState('');
+
     // deleting existing bike
     const [brand, setBrand] = useState('');
     const [bikeModel, setBikeModel] = useState('');
@@ -46,8 +51,18 @@ const Admin = () => {
     const [paymentData, setPaymentData] = useState();
 // get bookings data
     async function getbookings(){
-        await axios.get('http://localhost:8000/bookings').then((res) => setPaymentData(res.data.bookings))
-        console.log(paymentData)
+        await axios.get('http://localhost:8080/bookings').then((res) => {setPaymentData(res.data.bookings)
+        // await axios.get('http://localhost:8080/bookings').then((res) => { 
+        //     let result = res.data.bookings.sort((a,b) => a.serviceDate - b.serviceDate)
+        // console.log(result)
+
+        // res.data.bookings.map((item) => {
+
+        //     if( (date <= item?.serviceDate?.split('/')[0]) && (month <= item?.serviceDate?.split('/')[1]))  {
+        //         console.log(item)
+        //     }
+        // })
+    })
       }
 
 
@@ -55,10 +70,21 @@ const Admin = () => {
        
         getbookings();
 
+//         const d1 = "07/06/2023";
+// const d2 = "06/06/2023";
+// let dd1 = dayjs(d1).format('YYYY-MM-DD')
+// let dd2 = dayjs(d2).format('YYYY-MM-DD')
+// console.log(moment(dd1).isSameOrBefore(dd2) , 'moment')
+//const f = "08/03/2023";
+// const f = "23/06/2023";
+// console.log(dayjs(f).format('YYYY-MM-DD'))
+// console.log(moment('2023-09-02').isSameOrBefore('2023-08-01'))
+
+//console.log(moment(current_date).isSameOrAfter(dayjs(f)))
 
     }, [])
 
-
+/*
     async function savedata() {
 
         const newBike = {
@@ -69,7 +95,7 @@ const Admin = () => {
         }
 
         try {
-            await axios.post('http://localhost:8000/bikes/addbike', newBike)
+            await axios.post('http://localhost:8080/bikes/addbike', newBike)
             window.location.reload(true)
         } catch (error) {
             console.log('error in adding new bike', error);
@@ -79,21 +105,43 @@ const Admin = () => {
         setCc('');
         setImage('');
 
-    }
+    } */
+
+
     // deleting bike data
-    function deleteData(data) {
+  /*  function deleteData(data) {
         const id_number = data._id;
         try {
-            axios.delete(`http://localhost:8000/bikes/delete/${id_number}`)
+            axios.delete(`http://localhost:8080/bikes/delete/${id_number}`)
             window.location.reload(true)
 
         } catch (error) {
             console.log('error in deleting bike data', error)
         }
-    }
+    } */
 
     let Home_Service = 0;
     let today_home_service = 0;
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
    
   function homeServiceCount(){
 
@@ -131,13 +179,29 @@ const Admin = () => {
 
     // })
 
+  let  dateSort = (a,b) => {
+        const d1 = new Date (a.serviceDate);
+        const d2 = new Date (b.serviceDate);
+        if( d1 < d2 ) return 1;
+        else if(d1 > d2 ) return -1;
+        return 0;
+        }
 
+
+
+const [thisDay , setThisDay] = useState([]);
+
+
+
+
+var serial_number = 0;
 
 
     return (
 
-        <div>
-            <Mininav />
+        <div > 
+          
+            <Adminnav />
 
 
             {/* <div>  
@@ -145,7 +209,7 @@ const Admin = () => {
             <p> cost for general service of bikes having cc 125 - 200 is :</p> <span> ₹  </span> <input value={price2} onChange={e => setPrice2(e.target.value)}/>
             <p> cost for general service of bikes having cc 200 - 200 above :</p> <span> ₹  </span> <input value={price3} onChange={e => setPrice3(e.target.value)}/>
         </div> */}
-
+{/*  
             <div className='add-new-bike'>
                 <p className='add-bike-heading'> ADD NEW BIKE HERE</p>
                 <TextField className="mb-3 mt-3" label="Bike Company" variant="outlined" color="secondary" value={bikeCompany} onChange={(e) => setBikeCompany(e.target.value)} style={{ width: "300px" }} />
@@ -153,17 +217,14 @@ const Admin = () => {
                 <TextField className="mb-3" label="Bike CC" variant="outlined" color="secondary" value={cc} onChange={(e) => setCc(e.target.value)} style={{ width: "300px" }} />
                 <TextField className="mb-3" label="Image Link" variant="outlined" color="secondary" value={image} onChange={(e) => setImage(e.target.value)} style={{ width: "300px" }} />
                 <button className="mb-5 btn btn-primary" color="secondary" onClick={() => savedata()}> SAVE </button>
-            </div>
+            </div> */}
 
             {/* <div className='delete-bike'>
                 <input value={brand} onChange={e => setBrand(e.target.value)} placeholder='Bike Company' />
                 <input value={bikeModel} onChange={e => setBikeModel(e.target.value)} placeholder='Bike Model' />
 
             </div> */}
-<h3>UPCOMING SERVICES</h3>       <span> Upcoming Home Service : {homeServiceCount()[0]} </span> <span> Today Home Service : {homeServiceCount()[1]} </span>  
-            <div className='search-bar'>
-                <input type='search' placeholder='Search here...' value={psearch} onChange={e => setPsearch(e.target.value)} />
-            </div>
+
 
             {/* <div className='upcoming-services'>
                 <Table striped className='mb-3 mt-3' variant='info' hover responsive>
@@ -218,8 +279,12 @@ const Admin = () => {
                 </Table>
             </div> */}
 {/* ****************************************************************************** */}
-{
-     <div className='upcoming-services'>
+
+     <div className='upcoming-services container'>
+     <h3>UPCOMING SERVICES</h3>       <span> Upcoming Home Service : {homeServiceCount()[0]} </span> <span> Today Home Service : {homeServiceCount()[1]} </span>  
+            <div className='search-bar'>
+                <input type='search' placeholder='Search here...' value={psearch} onChange={e => setPsearch(e.target.value)} />
+            </div>
                 <Table striped className='mb-3 mt-3' variant='info' hover responsive>
 
                     <thead >
@@ -257,10 +322,15 @@ const Admin = () => {
                     })
                         .map((item, index) => {
 
-                            if( (date >= item.serviceDate?.split('/')[0]) && (month >= item.serviceDate?.split('/')[1]))  {
+                          //  if( (date <= item.serviceDate?.split('/')[0]) && (month <= item.serviceDate?.split('/')[1]))  {
+                                if( moment(current_date).isSameOrBefore(item.serviceDate) ){
+                                    thisDay.push(item)
+                                   // setThisDay(item)
+                              
                                 return(
+                                    
                                     <tr key={item._id}>
-                                    <td> {index + 1}</td>
+                                    <td> {serial_number = serial_number+ 1}</td>
                                     <td>{item.name}</td>
                                     <td>{item.mobile}</td>
                                     <td>{item.bike}</td>
@@ -270,17 +340,18 @@ const Admin = () => {
                                     <td>{item.serviceDate}</td>
                                     <td>{item.time}</td>
                                     <td>{item.paid}</td>
-                                    </tr> 
-                                )                            
+                                    </tr>  
+                                )    
+                                                      
                                 } 
                         })}
                     </tbody>
                 </Table>
             </div>                              
-}
+                    
 
 
-
+{/* 
 <h3>SERVICES WE PROVIDE FOR</h3>
             <div className='search-bar'>
                 <input type='search' placeholder='Search here...' value={search} onChange={e => setSearch(e.target.value)} />
@@ -324,9 +395,9 @@ const Admin = () => {
 
 
                 </tbody>
-            </Table>
+            </Table>  */}
 
-            <Footer />
+            <Footer /> {console.log(thisDay)}
         </div>
 
     )

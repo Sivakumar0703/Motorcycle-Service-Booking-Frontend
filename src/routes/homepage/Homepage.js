@@ -71,7 +71,25 @@ const navigate = useNavigate();
       </div>
 
 
+      <div className='about-servcie'>
+        <div className='about-card'>
 
+        
+        <p className='about-title'>  QUALITY ASSURED </p>
+        <p className='about-text'>  The best two wheeler services delivered in your parking with assured quality. </p>
+        <ul>
+          <li> Contactless Service </li>
+          <li> Genuine Spares </li>
+          <li> Skilled Mechanics </li>
+          <li> 7 day service warranty </li>
+        </ul>
+        </div>
+
+        <div className='Qualitycheck-img'>
+        <img src={require("./mechanics.webp")} alt="mechanics" />
+        </div>
+
+      </div>
 
 
 

@@ -101,7 +101,7 @@ const Service = () => {
        
 
         try {
-            let user_data = await axios.post('http://localhost:8000/bookings/general/service/addbooking', customer)
+            let user_data = await axios.post('http://localhost:8080/bookings/general/service/addbooking', customer)
             console.log(user_data);
            
         } catch (error) {
@@ -184,7 +184,7 @@ const Service = () => {
                 // {console.log(price)}
 
                 // razor - to get order id        
-                price && await axios.post('http://localhost:8000/razorpay/order', { amount: pricee }).then((res) => {
+                price && await axios.post('http://localhost:8080/razorpay/order', { amount: pricee }).then((res) => {
                     console.log('response from backend to get order id', res, res.data, res.data.orderId)
                     setOrderId(res.data.orderId)
                     console.log(res.data.orderId)
@@ -218,10 +218,10 @@ const Service = () => {
     // for payment verification
     function verify(payment, order, signature) {
         try {
-            axios.post('http://localhost:8000/razorpay/api/payment/verify', { paymentId: payment, orderId: order, signature: signature }).then(res => console.log('payment verification data sent', res))
+            axios.post('http://localhost:8080/razorpay/api/payment/verify', { paymentId: payment, orderId: order, signature: signature }).then(res => console.log('payment verification data sent', res))
             console.log('payment & order ', payment, order);
 
-            axios.post('http://localhost:8000/payments/payment/info', { // product & user detail to backend for storing in db
+            axios.post('http://localhost:8080/payments/payment/info', { // product & user detail to backend for storing in db
                 brand: detail.bikeCompany,
                 model: detail.model,
                 registration: register,

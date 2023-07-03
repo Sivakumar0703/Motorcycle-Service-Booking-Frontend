@@ -31,16 +31,20 @@ ChartJS.register(
 const Linechart = () => {
 
 const[info , setInfo] = useState()
+const[bookings , setBookings] = useState([])
 //const[length , setLength] = useState();
 
     useEffect(()=>{
         async function getData(){
-            const bookingInfo = await axios.get('http://localhost:8000/bookings').then(res => {
-                setInfo(res.data.bookings)
+            const bookingInfo = await axios.get('http://localhost:8080/bookings').then(res => {
+                
               // setLength(info?.length)
              //  setLength(res.data.bookings.length)
-               console.log(info , 'inside get info data from backend')
+              // console.log(info , 'inside get info data from backend')
+              console.log('receive bookings')
                countMonth(res.data.bookings);
+               setInfo(res.data.bookings)
+               console.log('receive bookings ends')
             })
             
 
@@ -53,6 +57,7 @@ const[info , setInfo] = useState()
 //const months = [];
 const months = ["01","02","03","04","05","06","07","08","09","10","11","12"];
 const booking_data = [];
+
 
 // for(let i=0;i<12;i++){
    
@@ -79,39 +84,32 @@ function countMonth(data){
         const length = data.length;
     
         for(let j=0;j<length;j++){
-            if(data[j].serviceDate?.split('/')[1] === months[i]){
+            if(data[j].serviceDate.split('-')[1] === months[i]){
                 count++;
-                console.log(data[j].serviceDate?.split('/')[1] , months[i])
+                console.log('service date ',data[j].serviceDate.split('-')[1] , months[i])
             }
         }
-        booking_data.push(count);
-        
+       // booking_data.push(count);
+        //bookings.push(count)
+        setBookings((old) => [...old , count])
         console.log('************' , count)   
     }
+     return 0;
 
 }
-
-
-
-
-
-
-
-
-
 
 
 // chart
 const data = {
     labels : ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
     datasets:[{
-        labels:'service from the beginning',
-        data:[10,20,15,25,19,60,40,15,5,90,25,36],
+        label:'Number of Bookings',
+        data:bookings,
         pointBorderColor:'red',
         backgroundColor: '#9BD0F5',
         borderColor: 'violet',
         fill:true,
-        tension:0.1
+        tension:0.4
     }]
 }
 
@@ -128,9 +126,10 @@ const options = {
 
 
   return (
-    <div style={{width:'800px',height:'500px'}}>Linechart {console.log(booking_data)}
+    info ? (
+    <div style={{width:'800px',height:'500px'}}> {console.log('booking data ',booking_data)}
 
-    {console.log(booking_data)}
+    {console.log('bookings ',bookings)}
     
   
 
@@ -142,7 +141,7 @@ const options = {
         </Line>
 
 
-    </div>
+    </div>  ) : 'Loading...'
   )
 }
 

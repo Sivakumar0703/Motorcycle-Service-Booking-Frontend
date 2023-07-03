@@ -21,6 +21,12 @@ import AdminPrice from './routes/admin/AdminPrice';
 import Services from './routes/Service/Services';
 import Booking from './components/Booking/Booking';
 import Linechart from './components/Chart/Linechart';
+import DoughnutChart from './components/Chart/Doughnut';
+import Adminnav from './routes/admin/Adminnav';
+import AdminAddBikes from './routes/admin/AdminAddBikes';
+import Dashboard from './routes/admin/Dashboard';
+import Contact from './routes/Contact/Contact';
+import Slider from './components/Slider/Slider';
 
 function App() {
   return (
@@ -41,10 +47,16 @@ function App() {
       <Route path='/washing' element={<Washing />} />
       <Route path='/navie' element={<Mininav />} />
       <Route path='/profile' element={<Profile />} />
-      <Route path='/admin' element={<Admin />} />
+      <Route path='/admin/bookings' element={<Admin />} />
       <Route path='/admin/price' element={<AdminPrice />} />
       <Route path='/booking' element={<Booking/>} />
       <Route path='/chart' element={<Linechart />} />
+      <Route path='/chart2' element={<DoughnutChart />} />
+      <Route path='/adminnav' element={<Adminnav />} />
+      <Route path='/admin/add/bikes' element={<AdminAddBikes />} />
+      <Route path='/admin/dashboard' element={<Dashboard />} />
+      <Route path='/contact' element={<Contact />} />
+      <Route path='/slider' element={<Slider />} />
 
       
       

@@ -12,7 +12,7 @@ const Washing = () => {
   const amount = price &&  price.washServicePrice;
   console.log(amount)
   const serviceType = "Water Wash";
-  const url = "http://localhost:8000/bookings/water/wash/service/addbooking";
+  const url = "http://localhost:8080/bookings/water/wash/service/addbooking";
 
 
   return (

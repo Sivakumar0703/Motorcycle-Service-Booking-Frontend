@@ -92,7 +92,7 @@ const Booking = ({ amount, url, serviceType, homeService, userId }) => {
             bike: '',
             model: '',
             time: '',
-            serviceDate: dayjs(date).format('DD/MM/YYYY'),
+            serviceDate: dayjs(date).format('YYYY-MM-DD'),
             //  paid:price && price,
             //  homeService:homeService,
             //  userId:userId
@@ -132,7 +132,7 @@ const Booking = ({ amount, url, serviceType, homeService, userId }) => {
                     console.log('order id function called => price', price)
     
                   price &&  console.log('order id function inside if  => price', price)
-                    await axios.post('http://localhost:8000/razorpay/order', { amount:price && price }).then((res) => {
+                    await axios.post('http://localhost:8080/razorpay/order', { amount:price && price }).then((res) => {
                         console.log('response from backend to get order id', res, res.data, res.data.orderId)
                         setOrderId(res.data.orderId)
                         console.log('setting order id : ', res.data.orderId)
@@ -167,12 +167,12 @@ const Booking = ({ amount, url, serviceType, homeService, userId }) => {
     async function verify(payment, order, signature , bookingData) {
         try {
             console.log('order id : ', order, ',', 'signature : ', signature)
-            await axios.post('http://localhost:8000/razorpay/api/payment/verify', { paymentId: payment, orderId: order, signature: signature }).then(res => {
+            await axios.post('http://localhost:8080/razorpay/api/payment/verify', { paymentId: payment, orderId: order, signature: signature }).then(res => {
 
                 if (res.data.signatureIsValid === "true") {
                     //  user booking detail to backend for storing in db
-                    axios.post(url, { ...bookingData, homeService: checked, userId: user.id, paid: price })
-                    console.log({ ...bookingData, homeService: checked, userId: user.id });
+                    axios.post(url, { ...bookingData, homeService: checked, userId: user.id, paid: price,orderId:orderId })
+                    console.log({ ...bookingData, homeService: checked, userId: user.id ,orderId:orderId });
                     toast.success("Payment Successful");
                     toast.success("Booking successful");
                 } else {

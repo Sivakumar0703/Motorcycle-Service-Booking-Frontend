@@ -59,7 +59,7 @@ const Register = () => {
       try {
 
        // if ((values.userName && values.email && values.mobile && values.password && values.confirmpassword) !== '') {
-          const result = await axios.post('http://localhost:8000/users/signup', newuser).data
+          const result = await axios.post('http://localhost:8080/users/signup', newuser).data
           
          // toast.success('Registration successful');
          // navigate('/login')

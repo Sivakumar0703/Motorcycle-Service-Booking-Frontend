@@ -9,6 +9,7 @@ export  const BikeContext = createContext();
 
  const [bikes , setBikes] = useState();
 const [price , setPrice] = useState();
+const [bookings , setBookings] = useState();
 
 
  useEffect(() => {
@@ -19,8 +20,9 @@ const [price , setPrice] = useState();
       try {
 
 
-         await axios.get('http://localhost:8000/bikes').then((res) => setBikes(res.data.bikes))
-         await axios.get('http://localhost:8000/service/price').then(res => setPrice(res.data.price[0]))
+         await axios.get('http://localhost:8080/bikes').then((res) => setBikes(res.data.bikes))
+         await axios.get('http://localhost:8080/service/price').then(res => setPrice(res.data.price[0]))
+         await axios.get('http://localhost:8080/bookings').then(res => setBookings(res.data.bookings))
         
              
 
@@ -37,10 +39,10 @@ const [price , setPrice] = useState();
 
   return (
 
-    <BikeContext.Provider value = {{bikes , price , setPrice}} >
+    <BikeContext.Provider value = {{bikes , price , setPrice , bookings}} > 
 
         {children}
-        { console.log(price)}
+      
 
     </BikeContext.Provider>
 

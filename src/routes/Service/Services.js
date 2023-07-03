@@ -9,6 +9,7 @@ import Button from 'react-bootstrap/Button';
 import { toast } from 'react-toastify'
 import Mininav from '../../components/Navigation/Mininav';
 import dayjs from 'dayjs';
+import Loading from '../../components/Loading/Loading';
 
 const Services = () => {
 
@@ -82,14 +83,15 @@ const Services = () => {
             register,
             bike,
             model,
-            serviceDate:dayjs(date).format('DD/MM/YYYY'),
-
+            serviceDate:dayjs(date).format('YYYY-MM-DD'),
+            orderId,
+            price,
 
             serviceType: 'regular service'
         }
         console.log(customer);
         try {
-            let user_data = await axios.post('http://localhost:8000/bookings/general/service/addbooking', customer)
+            let user_data = await axios.post('http://localhost:8080/bookings/general/service/addbooking', customer)
             console.log(user_data);
 
         } catch (error) {
@@ -128,7 +130,7 @@ const Services = () => {
 
             try {
                 // razor - to get order id        
-                price && await axios.post('http://localhost:8000/razorpay/order', { amount: pricee }).then((res) => {
+                price && await axios.post('http://localhost:8080/razorpay/order', { amount: pricee }).then((res) => {
                     console.log('response from backend to get order id', res, res.data, res.data.orderId)
                     setOrderId(res.data.orderId)
                     console.log(res.data.orderId)
@@ -145,10 +147,10 @@ const Services = () => {
     // for payment verification
     function verify(payment, order, signature) {
         try {
-            axios.post('http://localhost:8000/razorpay/api/payment/verify', { paymentId: payment, orderId: order, signature: signature }).then(res => console.log('payment verification data sent', res))
+            axios.post('http://localhost:8080/razorpay/api/payment/verify', { paymentId: payment, orderId: order, signature: signature }).then(res => console.log('payment verification data sent', res))
             console.log('payment & order ', payment, order);
 
-            axios.post('http://localhost:8000/payments/payment/info', { // product & user detail to backend for storing in db
+            axios.post('http://localhost:8080/payments/payment/info', { // product & user detail to backend for storing in db
                 brand: detail.bikeCompany,
                 model: detail.model,
                 registration: register,
@@ -275,7 +277,7 @@ const Services = () => {
             {/* bike image div */}
 
             <div className='bike-img'>
-                {detail && detail.model === model ? <img src={detail.image} alt='bike' /> : <img src='' alt='bike' />}
+                {detail && detail.model === model ? <img src={detail.image} alt='bike' /> : <Loading/> }
             </div>
 
             {/* service detail list */}

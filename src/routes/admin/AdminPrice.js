@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { BikeState } from '../../context/Context';
 import '../admin/Admin.css';
+import Adminnav from './Adminnav';
 
 const AdminPrice = () => {
 
@@ -22,7 +23,7 @@ function updateChange(){
         washServicePrice : wash
     }
 
-    axios.put(`http://localhost:8000/service/price/update/${price._id}` , priceList)
+    axios.put(`http://localhost:8080/service/price/update/${price._id}` , priceList)
 }
 
 useEffect(()=>{
@@ -33,7 +34,13 @@ useEffect(()=>{
 
   return (
 
-    <div className='price-list'> 
+<div className='price-page'>
+  <Adminnav />
+<p>CHANGE SERVICE PRICE ACCORDING TO THE MARKET PRICE</p>
+<p>PLEASE ENTER THE NEWLY FIXED PRICE IN THE RESPECTIVE INPUT BOX AND SAVE CHANGES TO ALTER THE SERVICE COST.</p>
+
+
+    <div className='price-list '> 
         <label className='price-label' >General Service less than 125 cc </label>  <br/>
         <input  value={general1} placeholder={price && price.generalServicePrice.general1} onChange={e => setGeneral1(e.target.value)} /> <br/>
 
@@ -49,8 +56,9 @@ useEffect(()=>{
         <label className='price-label' >Water Wash Service</label> <br/>
         <input  value={wash} placeholder={price && price.washServicePrice} onChange={e => setWash(e.target.value)} /> <br/> <br/>
 
-        <button className='btn btn-primary' onClick={updateChange}> Save Changes  </button>
+        <button className='btn btn-primary mb-3' onClick={updateChange}> Save Changes  </button>
 
+    </div>
     </div>
   )
 }
