@@ -1,9 +1,9 @@
 import { TextField } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import '../Register/Register.css'
 
-//import { toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup'; // for form validation schema
 import { useFormik } from 'formik';
@@ -58,30 +58,34 @@ const Register = () => {
 
       try {
 
-       // if ((values.userName && values.email && values.mobile && values.password && values.confirmpassword) !== '') {
-          const result = await axios.post('http://localhost:8080/users/signup', newuser).data
+        if ((values.userName && values.email && values.mobile && values.password && values.confirmpassword) !== '') {
+           await axios.post('http://localhost:8080/users/signup', newuser).then((res) =>{ toast.success(res.data.message) ; navigate('/login')})
+           
+           .catch(error => toast.error(error.response.data.message))
           
          // toast.success('Registration successful');
          // navigate('/login')
-      //  } else {
-       //   toast.error('please fill all the fields in the form');
-       // }
+        } else {
+          toast.error('please fill all the fields in the form');
+        }
 
       } catch (error) {
-        console.log(error)
+        console.log(error , 'catch')
       }
 
-
-
-
-
-
   }
+
+  useEffect(() => {
+    if(localStorage.getItem('user')){
+      navigate('/');
+      toast.warning('Logout and try again')
+    }
+  })
 
 
   return (
 
-    <div className='container row signup-registration col-12' > 
+    <div className='signup-registration row col-12' > 
 
 
 

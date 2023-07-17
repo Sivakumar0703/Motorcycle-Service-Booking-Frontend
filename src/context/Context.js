@@ -1,37 +1,36 @@
-import React ,{createContext,useState,useEffect,useContext} from 'react'
+import React, { createContext, useState, useEffect, useContext } from 'react'
 import axios from 'axios'
 
 
-export  const BikeContext = createContext();
+export const BikeContext = createContext();
 
- const MyContext = ({children}) =>  {
-
-
- const [bikes , setBikes] = useState();
-const [price , setPrice] = useState();
-const [bookings , setBookings] = useState();
+const MyContext = ({ children }) => {
 
 
- useEffect(() => {
+  const [bikes, setBikes] = useState();
+  const [price, setPrice] = useState();
+  const [bookings, setBookings] = useState();
+  const [users, setUsers] = useState();
+
+  const url = 'https://web-application-for-motorcycle-service.onrender.com';
 
 
-   async function getBike(){
+  useEffect(() => {
+
+
+    async function getBike() {
 
       try {
-
-
-         await axios.get('http://localhost:8080/bikes').then((res) => setBikes(res.data.bikes))
-         await axios.get('http://localhost:8080/service/price').then(res => setPrice(res.data.price[0]))
-         await axios.get('http://localhost:8080/bookings').then(res => setBookings(res.data.bookings))
-        
-             
-
+        await axios.get(`${url}/bikes`).then((res) => setBikes(res.data.bikes))
+        await axios.get(`${url}/service/price`).then(res => setPrice(res.data.price[0]))
+        await axios.get(`${url}/bookings`).then(res => setBookings(res.data.bookings))
+        await axios.get(`${url}/users`).then(res => setUsers(res.data.user))
       } catch (error) {
-        console.log(error , 'context error')
+        console.log(error, 'context error')
       }
 
-   }
-   getBike();
+    }
+    getBike();
 
 
   }, [])
@@ -39,10 +38,10 @@ const [bookings , setBookings] = useState();
 
   return (
 
-    <BikeContext.Provider value = {{bikes , price , setPrice , bookings}} > 
+    <BikeContext.Provider value={{ bikes, price, setPrice, bookings, users , url}} >
 
-        {children}
-      
+      {children}
+
 
     </BikeContext.Provider>
 
@@ -52,5 +51,5 @@ const [bookings , setBookings] = useState();
 export default MyContext
 
 export const BikeState = () => {
- return useContext(BikeContext);
+  return useContext(BikeContext);
 }

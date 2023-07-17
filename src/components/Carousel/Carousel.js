@@ -12,7 +12,7 @@ const Carousell = () => {
        <div className='sliding-img'>
        <img
           className="d-block w-100 "
-          src="https://static.vecteezy.com/system/resources/previews/007/135/706/original/mechanic-hold-hex-key-wrench-working-on-motorcycle-at-motorbike-garage-concept-of-motorcycle-maintenance-and-repair-selective-focus-free-photo.jpg"
+          src={require('./images/car-1.jpg')}
           alt="First slide"
         />
        </div>
@@ -25,7 +25,7 @@ const Carousell = () => {
         <div className='sliding-img'>
         <img
           className="d-block w-100 sliding-img"
-          src="https://offroadvietnam.com/media/motorbike-spare-parts-for-sale-hanoi-offroad-vietnam-motorcycle-tours-office.jpg?5a7b53&5a7b53"
+          src={require('./images/car-2.jpg')}
           alt="Second slide"
         />
 </div>
@@ -38,7 +38,7 @@ const Carousell = () => {
         <div className='sliding-img' >
         <img
           className="d-block w-100 sliding-img"
-          src="https://th.bing.com/th/id/OIP.K1lNMJ8MBuapfjwr0-IL0gHaDh?pid=ImgDet&rs=1"
+          src={require('./images/car-3.jpeg')}
           alt="Third slide"
         />
 </div>

@@ -1,30 +1,27 @@
-import React from 'react'
-import "../Booking/Booking.css"
+import React from 'react';
+import { useEffect, useState } from "react";
+import "../Booking/Booking.css";
 
-import { TextField } from '@mui/material'
-import { Checkbox } from '@mui/material'
+import { TextField } from '@mui/material';
+import { Checkbox } from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import * as yup from 'yup'; // for form validation schema
 import { useFormik } from 'formik';
 import axios from 'axios';
 import { toast } from 'react-toastify'
 import { BikeState } from '../../context/Context';
-import InfoIcon from '@mui/icons-material/Info';
-import Tooltip from '@mui/material/Tooltip';
-
-// mui
-import MenuItem from '@mui/material/MenuItem'; // for select option
-// mui - datepicker
+//import InfoIcon from '@mui/icons-material/Info';
+//import Tooltip from '@mui/material/Tooltip';
 import dayjs from 'dayjs';
-//import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-//import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+
+import MenuItem from '@mui/material/MenuItem';
+// mui - datepicker
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { useEffect, useState } from "react"
 
-// general service - payment | repair service - booking
 
+// Service at home
 var HomeServiceRegisterSchemaValidation = yup.object({
     name: yup.string().min(3, 'name should have minimum 3 character').required("Enter Your Name"),
     address1: yup.string().required("Enter address1"),
@@ -37,6 +34,7 @@ var HomeServiceRegisterSchemaValidation = yup.object({
     time: yup.string().required('Select time slot'),
 })
 
+// Service at garage
 var registerSchemaValidation = yup.object({
     name: yup.string().min(3, 'name should have minimum 3 character').required("Enter Your Name"),
     mobile: yup.string().matches(/^[0-9]{10}/, "Enter valid mobile number").required("Enter Mobile Number"),
@@ -46,40 +44,25 @@ var registerSchemaValidation = yup.object({
     time: yup.string().required('Select time slot'),
 })
 
-const Booking = ({ amount, url, serviceType, homeService, userId }) => {
+const Booking = ({ amount, url_address, serviceType }) => {
 
+    const { bikes } = BikeState([]);
+    const [orderId, setOrderId] = useState();
+    const [disable, setDisable] = useState(false);
+    const [checked, setChecked] = useState(true); //checkbox
+    const today = dayjs();
+    const [date, setDate] = useState(today);
+    const { url } = BikeState();
+
+    const price = amount;
+    const bikeAry = [];
+    let brand = [];
+    const timeslot = ["09:00", "11:00", "14:00", "16:00"];
+    const today_format = dayjs(date).format('YYYY-MM-DD'); // service date
     const user = JSON.parse(localStorage.getItem('user'));
 
 
-    const { bikes } = BikeState([]);
-    const timeslot = ["09:00", "11:00", "14:00", "16:00"];
-    const [orderId, setOrderId] = useState();
-    console.log(orderId, 'order id')
-    const price = amount;
-    console.log(price, 'price')
-    const bikeAry = [];
-    let brand = [];
-    const today = dayjs();
-
-
-
-    const [disable, setDisable] = useState(false)
-
-    const [date, setDate] = useState(today);
-    //const today_format =`${date.$D}/${date.$M + 1}/${date.$y}` ;
-    const today_format = dayjs(date).format('DD/MM/YYYY');
-    console.log(today_format)
-
-    //checkbox
-    const [checked, setChecked] = useState(true)
-    //const[detail , setDetail] = useState()
-   // console.log(detail)
-   // console.log({...detail})
-
-    //const[touch , setTouch] = useState(true)
-
     // formik function
-
     const { values, handleChange, handleSubmit, handleBlur, errors, touched } = useFormik({
         initialValues: {
             name: "",
@@ -92,70 +75,45 @@ const Booking = ({ amount, url, serviceType, homeService, userId }) => {
             bike: '',
             model: '',
             time: '',
-            serviceDate: dayjs(date).format('YYYY-MM-DD'),
-            //  paid:price && price,
-            //  homeService:homeService,
-            //  userId:userId
-
-
         },
 
         validationSchema: checked ? HomeServiceRegisterSchemaValidation : registerSchemaValidation,
-        onSubmit: (bookingData) => { getData(bookingData)
-            
-          
+        onSubmit: (bookingData, onSubmitProps) => {
+            getData(bookingData)
+            onSubmitProps.resetForm() // reset input feilds
+            setDisable(false)
         }
 
     })
-    // product & user detail to backend for storing in db
-    // function addbooking(bookingData) {
-    //     axios.post('http://localhost:8000/bookings/water/wash/service/addbooking', {...bookingData , homeService:checked , userId: user.id})
-    //     console.log({...bookingData, homeService:checked , userId: user.id});
-
-    //     handleSubmitt();
-    // }
-
-    // get all brands with duplicates
-    bikes && bikes.map((i) => bikeAry.push(i.bikeCompany))
-
-    brand = unique(bikeAry)
 
     // to remove duplicates in brand array
     function unique(array) {
         return array.filter((item, index) => array.indexOf(item) === index)
     }
 
-            // useEffect is used to get order id from razorpay
-            async function getData(bookingData) {
-                try {
-    
-                    console.log('order id function called => price', price)
-    
-                  price &&  console.log('order id function inside if  => price', price)
-                    await axios.post('http://localhost:8080/razorpay/order', { amount:price && price }).then((res) => {
-                        console.log('response from backend to get order id', res, res.data, res.data.orderId)
-                        setOrderId(res.data.orderId)
-                        console.log('setting order id : ', res.data.orderId)
-                        handleSubmitt(res.data.orderId , bookingData)
-    
-                    })
-    
-                } catch (error) {
-                    console.log(error);
-                }
-            }
+    // check box for home service
+    function checkbox(val) {
+        setChecked(val)
+    }
+
+
+    // get all brands with duplicates
+    bikes && bikes.map((i) => bikeAry.push(i.bikeCompany))
+    brand = unique(bikeAry)
 
 
 
-
-
-    // useEffect(() => {
-    //     console.log('use effect called')
-         
-    //         getData();
-          
-    // }, [])
-
+    // fetching order id from backend
+    async function getData(bookingData) {
+        try {
+            await axios.post(`${url}/razorpay/order`, { amount: price && price }).then((res) => {
+                setOrderId(res.data.orderId)
+                handleSubmitt(res.data.orderId, bookingData)
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     useEffect(() => {
         if (values.bike.length > 2) {
@@ -164,40 +122,26 @@ const Booking = ({ amount, url, serviceType, homeService, userId }) => {
     }, [values.model])
 
     // for payment verification
-    async function verify(payment, order, signature , bookingData) {
-        try {
-            console.log('order id : ', order, ',', 'signature : ', signature)
-            await axios.post('http://localhost:8080/razorpay/api/payment/verify', { paymentId: payment, orderId: order, signature: signature }).then(res => {
+    async function verify(payment, order, signature, bookingData) {
 
-                if (res.data.signatureIsValid === "true") {
-                    //  user booking detail to backend for storing in db
-                    axios.post(url, { ...bookingData, homeService: checked, userId: user.id, paid: price,orderId:orderId })
-                    console.log({ ...bookingData, homeService: checked, userId: user.id ,orderId:orderId });
-                    toast.success("Payment Successful");
-                    toast.success("Booking successful");
-                } else {
-                    toast.error("Payment Failed")
-                }
+        await axios.post(`${url}/razorpay/api/payment/verify`, { paymentId: payment, orderId: order, signature: signature }).then(res => {
 
-            })
-            // setVerification(res.data.signatureIsValid))
-            //  console.log('payment & order ', payment, order);
+            if (res.data.signatureIsValid === "true") {
+                //  user booking detail to backend for storing in db
+                axios.post(url_address, { ...bookingData, homeService: checked, userId: user.id, paid: price, orderId: order, serviceDate: today_format })
+                toast.success("Payment Successful");
+                toast.success("Booking successful");
+            } else {
+                toast.error("Payment Failed")
+            }
 
+        })
 
-
-        } catch (error) {
-            console.log('error in sending payment verification data cart.js', error)
-        }
     }
 
     // razorpay payment integration
-    const handleSubmitt = async (id , bookingData) => {
-         //await  getData();
-        
+    const handleSubmitt = async (id, bookingData) => {
 
-
-        console.log(orderId && orderId, 'before razorpay starts')
-      
         var options = {
             key: "rzp_test_f3Zt6s7fSoiZSu",
             secret: "ObqLEeSpRqphtxBZI88ju0E7",
@@ -207,17 +151,11 @@ const Booking = ({ amount, url, serviceType, homeService, userId }) => {
             description: 'service',
             order_id: id,
             handler: function (response) {
-                console.log('container razorpay order id from be', response)
-
-                console.log("Payment_ID : ", response.razorpay_payment_id, '|', 'order_id : ', response.razorpay_order_id, '|', 'signature : ', response.razorpay_signature)
                 // payment verification
                 if (response.razorpay_payment_id) {
-                    verify(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature,bookingData )
-                    // toast.success("Payment Successful");
-                    // toast.success("Booking successful");
-
-
-                    // navigate('/dummy')
+                    verify(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature, bookingData)
+                } else {
+                    toast.error("Booking failed");
                 }
                 // verfication ends
             },
@@ -230,37 +168,19 @@ const Booking = ({ amount, url, serviceType, homeService, userId }) => {
                 color: "#3399cc"
             }
         };
-       
-
-
         var pay = new window.Razorpay(options); // if payment is successful
         pay.open()
 
     }
-
-    // check box
-
-
-    function checkbox(val) {
-        console.log(val)
-        setChecked(val)
-    }
-
-
-
-
-
-
-
 
 
 
     return (
         <div className='bookings-form'>
 
-            <form onSubmit={handleSubmit} style={{backgroundColor:'transparent'}}>
+            <form onSubmit={handleSubmit} style={{ backgroundColor: 'transparent' }}>
                 <div className='form-filling row'>
-                    <div className='left col-4'>
+                    <div className='left col-12 col-md-4'>
 
                         <TextField id="outlined-basic1" required label="USER NAME" onBlur={handleBlur} variant="outlined" fullWidth margin="normal" name="name" value={values.name} onChange={handleChange} />
                         {touched.name && errors.name ? <p className="error-msg" style={{ color: "red" }}>{errors.name}</p> : ""}
@@ -275,9 +195,10 @@ const Booking = ({ amount, url, serviceType, homeService, userId }) => {
                         {touched.address1 && errors.address1 ? <p className="error-msg" style={{ color: "red" }}>{errors.address1}</p> : ""}
 
                         <TextField id="outlined-basic4" required label="City/Village" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="address2" value={values.address2} onChange={handleChange} disabled={!checked} />
-                        {touched.address2 && errors.address2 ? <p className="error-msg" style={{ color: "red" }}>{errors.address2}</p> : ""} </div>
+                        {touched.address2 && errors.address2 ? <p className="error-msg" style={{ color: "red" }}>{errors.address2}</p> : ""}
+                    </div>
 
-                    <div className='right col-4'>
+                    <div className='right col-12 col-md-4'>
 
                         <TextField id="outlined-basic5" required label="Pincode" variant="outlined" fullWidth margin="normal" name="pincode" value={values.pincode} onChange={handleChange} disabled={!checked} />
                         {touched.pincode && errors.pincode ? <p className="error-msg" style={{ color: "red" }}>{errors.pincode}</p> : ""}
@@ -311,22 +232,18 @@ const Booking = ({ amount, url, serviceType, homeService, userId }) => {
                                 fullWidth
 
                             />
-                        </LocalizationProvider>  {console.log(today_format)}
+                        </LocalizationProvider>
 
-                        {/* `${e.$D}/${e.$M + 1}/${e.$y}` */}
+
 
                         <TextField select id="timeslot" label="Time-Slot" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="time" value={values.time} onChange={handleChange}
                             error={touched.time && Boolean(errors.time)} helperText={touched.time && errors.time} >
                             <MenuItem key={""} value={""}> --select time slot--  </MenuItem>
                             {timeslot.map((i) => <MenuItem value={i} key={i}> {i} </MenuItem>)}
-                        </TextField> </div> </div>
+                        </TextField>
+                    </div>
+                </div>
 
-                {/* <Checkbox
-                    label="Home Service"
-                    checked={checked}
-                    onChange={(e)=>checkbox(e.target.value)}
-                    inputProps={{ 'aria-label': 'controlled' }}
-                /> */}
 
                 <FormControlLabel control={<Checkbox onChange={(e) => checkbox(e.target.checked)} checked={checked} />} label="Home Service" />
 
@@ -335,40 +252,6 @@ const Booking = ({ amount, url, serviceType, homeService, userId }) => {
                 </div>
 
             </form>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         </div>
     )

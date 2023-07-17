@@ -3,35 +3,35 @@ import service_data from './service_data'; // static data (general service list)
 import './Service.css'
 import { BikeState } from '../../context/Context';
 import axios from 'axios';
-import Payment from '../payment/Payment';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { toast } from 'react-toastify'
 import Mininav from '../../components/Navigation/Mininav';
 import dayjs from 'dayjs';
 import Loading from '../../components/Loading/Loading';
+import Footer from '../../components/Footer/Footer'
+import { useNavigate } from 'react-router-dom';
 
 const Services = () => {
-
-    const { bikes, price } = BikeState()
-
-    const bikeAry = [];
-    let brand = [];
 
     const [name, setName] = useState('');
     const [mobile, setMobile] = useState('');
     const [register, setRegister] = useState('');
+    const [bike, setBike] = useState('');
+    const [model, setModel] = useState('');
+    const [pricee, setPricee] = useState('');
+    const [orderId, setOrderId] = useState(); // order id
+    const [show, setShow] = useState(false); // for modal
+    const handleClose = () => setShow(false); // for modal
+    const handleShow = () => setShow(true); // for modal
+    const navigate = useNavigate();
+    const { bikes, price, url } = BikeState();
+    const email = JSON.parse(localStorage.getItem('user'))?.email;
+    const userId = JSON.parse(localStorage.getItem('user'))?.id;
+    const user = localStorage.getItem('user');
+    const bikeAry = [];
+    let brand = [];
 
-    const [bike, setBike] = useState('')
-    const [model, setModel] = useState('')
-    const [pricee, setPricee] = useState('')
-
-    // address state
-    const [houseNumber, setHouseNumber] = useState('');
-    const [street, setStreet] = useState('');
-    const [city, setCity] = useState('');
-    const [district, setDistrict] = useState('');
-    const [pincode, setPincode] = useState('');
 
     // disable past date from calendar
     let current_date = new Date();
@@ -49,29 +49,17 @@ const Services = () => {
 
 
     let minDate = `${year}-${month}-${datee}`; // yyyy-mm-dd
-
-
     const [date, setDate] = useState(minDate); // yyyy-mm-dd
+    const [detail, setDetail] = useState(); // get a selected bike's data for displaying the image
 
 
-    let [detail, setDetail] = useState(); // get a selected bike data for image
-
-    // for modal
-    const [show, setShow] = useState(false);
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-
-    // order id
-    const [orderId, setOrderId] = useState();
-
-// get all brands without duplicates
-    bikes && bikes.map((i) => bikeAry.push(i.bikeCompany)) 
+    // get all brands without duplicates
+    bikes && bikes.map((i) => bikeAry.push(i.bikeCompany))
     brand = unique(bikeAry)
 
-    // on click book now
+
     function booknow(e) {
         e.preventDefault();
-        handleShow();
         customerData();
     }
 
@@ -79,41 +67,60 @@ const Services = () => {
         const customer = {
             name,
             mobile,
+            register,
+            bike,
+            model,
+        }
+        if (customer.name === '' || customer.mobile === '' || customer.register === '' || customer.bike === '' || customer.model === '') {
+            alert('please submit a valid form')
+        } else {
+            handleShow(customer);
+        }
+    }
+
+    async function bookings() {
+        const bookingData = {
+            name,
+            mobile,
             date,
             register,
             bike,
             model,
-            serviceDate:dayjs(date).format('YYYY-MM-DD'),
+            serviceDate: dayjs(date).format('YYYY-MM-DD'),
             orderId,
-            price,
-
-            serviceType: 'regular service'
+            price: pricee,
+            email,
+            serviceType: 'regular service',
+            userId: userId
         }
-        console.log(customer);
-        try {
-            let user_data = await axios.post('http://localhost:8080/bookings/general/service/addbooking', customer)
-            console.log(user_data);
-
-        } catch (error) {
-            console.log('error in posting user data', error)
-        }
+        await axios.post(`${url}/bookings/general/service/addbooking`, bookingData)
+        setName('');
+        setMobile('');
+        setRegister('');
+        setDate('');
+        setModel('');
+        setBike('');
     }
 
+
     useEffect(() => {
+
+        if (!user) {
+            navigate('/');
+            toast.warning('Please Login')
+        }
+
+        // setting price based on bike's cc
         bikes && bikes.map((i) => {
             if (i.model === model) {
                 if (i.cc >= 100 && i.cc < 125) {
-                    //console.log('cc less than or equal to 125', i.cc, setPrice(550))
-                    console.log('cc less than or equal to 125', i.cc, setPricee(price && price.generalServicePrice.general1))
+                    setPricee(price && price.generalServicePrice.general1)
                 } else if (i.cc >= 125 && i.cc < 200) {
-                    console.log('cc less than or equal to 200', i.cc, setPricee(price && price.generalServicePrice.general2))
-                    // console.log('cc less than or equal to 200', i.cc, setPrice(610))
+                    setPricee(price && price.generalServicePrice.general2)
                 } else {
-                    console.log('cc greater than 200', i.cc, setPricee(price && price.generalServicePrice.general3))
-                    // console.log('cc greater than 200', i.cc, setPrice(699))
+                    setPricee(price && price.generalServicePrice.general3)
                 }
                 setDetail(i)
-
             }
         })
     }, [model])
@@ -122,23 +129,19 @@ const Services = () => {
     function unique(array) {
         return array.filter((item, index) => array.indexOf(item) === index)
     }
-    
 
-    // razor pay area
+
+
     useEffect(() => {
         async function getData() {
 
             try {
                 // razor - to get order id        
-                price && await axios.post('http://localhost:8080/razorpay/order', { amount: pricee }).then((res) => {
-                    console.log('response from backend to get order id', res, res.data, res.data.orderId)
-                    setOrderId(res.data.orderId)
-                    console.log(res.data.orderId)
-
-                     
+                price && await axios.post(`${url}/razorpay/order`, { amount: pricee }).then((res) => {
+                setOrderId(res.data.orderId)  
                 })
             } catch (error) {
-                console.log(error)
+                toast.error('Cannot get order id')
             }
         }
         getData();
@@ -147,21 +150,7 @@ const Services = () => {
     // for payment verification
     function verify(payment, order, signature) {
         try {
-            axios.post('http://localhost:8080/razorpay/api/payment/verify', { paymentId: payment, orderId: order, signature: signature }).then(res => console.log('payment verification data sent', res))
-            console.log('payment & order ', payment, order);
-
-            axios.post('http://localhost:8080/payments/payment/info', { // product & user detail to backend for storing in db
-                brand: detail.bikeCompany,
-                model: detail.model,
-                registration: register,
-                customerName: JSON.parse(localStorage.getItem('user')).userName,
-                date: date,
-                price: pricee,
-                orderId: orderId,
-                serviceType: 'regular service',
-                name,
-                mobile
-            })
+            axios.post(`${url}/razorpay/api/payment/verify`, { paymentId: payment, orderId: order, signature: signature });
             handleClose();
         } catch (error) {
             console.log('error in sending payment verification data cart.js', error)
@@ -181,13 +170,13 @@ const Services = () => {
             order_id: orderId,
             handler: function (response) {
 
-                console.log("Payment_ID : ", response.razorpay_payment_id, '|', 'order_id : ', response.razorpay_order_id, '|', 'signature : ', response.razorpay_signature)
+               // console.log("Payment_ID : ", response.razorpay_payment_id, '|', 'order_id : ', response.razorpay_order_id, '|', 'signature : ', response.razorpay_signature)
                 // payment verification
                 if (response.razorpay_payment_id) {
                     verify(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature)
+                    bookings();
                     toast.success("Payment Successful");
-                    toast.success("Booking successful")
-                    // navigate('/dummy')
+                    toast.success("Booking successful");
                 }
                 // verfication ends
             },
@@ -197,18 +186,17 @@ const Services = () => {
                 contact: JSON.parse(localStorage.getItem('user')).mobile
             },
             notes: {
-                address: "online rental office address" // company address
+                address: "N0 13 18-cross street;Vadamathurai;641017" // company address
             },
             theme: {
                 color: "#3399cc"
             }
         };
-
-
-        var pay = new window.Razorpay(options); // if payment is successful
+        var pay = new window.Razorpay(options);
         pay.open()
-
     }
+
+
 
 
 
@@ -217,32 +205,26 @@ const Services = () => {
         <div  >
             <Mininav />
 
-
             <div className='booking-form  '>
-                <div className='bike-details ' > <form method='get' action=''>
+                <div className='bike-details ' > <form onSubmit={booknow}>
                     <h2> Bike Details </h2>
-                    <div className='bike-detail-feilds'> <input className='input' placeholder='Name' value={name} onChange={e => setName(e.target.value)} required /> </div>
-                    <div className='bike-detail-feilds'> <input type="tel" name="mobile" pattern="[0-9]{10}" title='please enter 10 digit mobile number' className='input' placeholder='mobile' value={mobile} onChange={e => setMobile(e.target.value)} required /> </div>
-                    <div className='bike-detail-feilds'> <input className='input' placeholder='Bike Registration Number' value={register} onChange={e => setRegister(e.target.value)} required /> </div>
-                    <div className='bike-detail-feilds'> <select placeholder='Select Bike Company' onChange={e => setBike(e.target.value)} required>
+                    <div className='bike-detail-feilds mb-2'> <input className='input' placeholder='Name' value={name} onChange={e => setName(e.target.value)} required /> </div>
+                    <div className='bike-detail-feilds mb-2'> <input type="tel" name="mobile" pattern="[0-9]{10}" title='please enter 10 digit mobile number' className='input' placeholder='mobile' value={mobile} onChange={e => setMobile(e.target.value)} required /> </div>
+                    <div className='bike-detail-feilds mb-2'> <input className='input' placeholder='Bike Registration Number' value={register} onChange={e => setRegister(e.target.value)} required /> </div>
+                    <div className='bike-detail-feilds mb-2'> <select placeholder='Select Bike Company' onChange={e => setBike(e.target.value)} required>
                         <option value=''> Select Bike  </option>
-                        {/* {bikes && bikes.map((i) => <option value={i.bikeCompany} key={i._id}> {i.bikeCompany} </option>)} */}
                         {brand.map((i) => <option value={i} key={i._id} > {i} </option>)}
-
-
                     </select> </div>
-                    <div className='bike-detail-feilds'> <select placeholder='Select Model' onChange={e => setModel(e.target.value)} required>
+                    <div className='bike-detail-feilds mb-2'> <select placeholder='Select Model' onChange={e => setModel(e.target.value)} required>
                         <option value=''> Select Model  </option>
-                        {/* {bikes && bikes.map((i) => <option value={i.model} key={i._id}> {i.model} </option>)} */}
                         {bikes && bikes.map((i) => bike && bike == i.bikeCompany ? <option value={i.model} key={i._id}> {i.model} </option> : '')}
-
-
                     </select> </div>
-                    <div>  <input className='input' id="calendar" type="date" value={date} min={minDate} onChange={e => setDate(e.target.value)} required /> </div>
+                    <div>  <input className='input mb-2' id="calendar" type="date" value={date} min={minDate} onChange={e => setDate(e.target.value)} required /> </div>
 
-                    <div>  <button className='btn btn-success' type="submit" onClick={booknow}> BOOK NOW</button> </div>
+                    <div>  <button className='btn btn-success' type="submit"> BOOK NOW</button> </div>
                 </form>
                 </div>
+
 
                 {/* modal */}
                 {detail &&
@@ -269,45 +251,31 @@ const Services = () => {
                 }
 
                 <div className='booking-form-img'>
-
-                    <img className='book' src='https://getaways.indianexcursion.in/wp-content/uploads/2020/10/book-now-indianexcursion.png' alt='book now' />
+                    <img className='book' src={require('./images/book_now.png')} alt='book now' />
                 </div>
             </div>
 
             {/* bike image div */}
-
             <div className='bike-img'>
-                {detail && detail.model === model ? <img src={detail.image} alt='bike' /> : <Loading/> }
+                {detail && detail.model === model ? <img src={detail.image} alt='bike' /> : <Loading />}
             </div>
 
             {/* service detail list */}
-
-
             <div className='general_service'>
-
 
                 <div className='service-list'>
                     <p> What are the things get covered in regular service ?  </p>
                     <ul>
                         {service_data.map((i) => <li key={i.id}> {i.value}  </li>)}
                     </ul>
-
                 </div>
 
-                <div className='service-img'>
-                    <img src="https://i.pinimg.com/originals/52/d5/59/52d5596e5ca84fa4ef6b7d3da48ac4a6.png" alt="cartoon" />
+                <div className='service-img mb-5'>
+                    <img src={require('./images/mechanic.png')} alt="cartoon" />
                 </div>
 
             </div>
-
-            {/*  */}
-
-            <div> hello
-
-            </div>
-
-
-
+            <Footer />
         </div>
     )
 }

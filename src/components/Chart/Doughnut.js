@@ -8,6 +8,8 @@ import {
     Legend,
 
 } from 'chart.js';
+import { BikeState } from '../../context/Context';
+import Loading from '../Loading/Loading';
 
 
 
@@ -15,22 +17,18 @@ ChartJS.register(
     ArcElement,
     Tooltip,
     Legend,
-
 );
-
-
-
-
 
 
 const DoughnutChart = () => {
 
     const [datas, setDatas] = useState();
+    const {url} = BikeState();
     const totalServiceCount = datas && datas.length;
 
     useEffect(() => {
 
-        axios.get('http://localhost:8080/bookings').then(res => setDatas(res.data.bookings))
+        axios.get(`${url}/bookings`).then(res => setDatas(res.data.bookings))
 
     }, [])
 
@@ -60,8 +58,7 @@ const DoughnutChart = () => {
     const general_percentage = ((generalCount() / totalServiceCount) * 100).toFixed(2);
     const repair_percentage = ((repairCount() / totalServiceCount) * 100).toFixed(2);
     const water_percentage = ((waterWashCount() / totalServiceCount) * 100).toFixed(2);
-    // console.log(general_percentage, repair_percentage, water_percentage)
-
+    
 
     const chartData = {
         labels: ["GENERAL", "REPAIR", "WATER WASH"],
@@ -92,12 +89,8 @@ const DoughnutChart = () => {
 
 
     return (
+        datas ? (
         <div>
-
-            {
-
-
-                data ?
                     <div >
                         <h2 className='m-2'>OVERALL SERVICE DETAIL</h2>
 
@@ -110,14 +103,9 @@ const DoughnutChart = () => {
                                 <h4>REPAIR : <span style={{ color: "red" }} > {repairCount()} </span> </h4>
                                 <h4>WASTER WASH : <span style={{ color: "blue" }} > {waterWashCount()} </span> </h4>
                             </div>
-
                         </div>
-
-
-                    </div> : <div> <p>  Loading... </p> </div>
-            }
-
-        </div>
+                    </div> 
+        </div> ) : <Loading/>
     )
 }
 

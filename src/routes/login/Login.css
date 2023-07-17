@@ -5,8 +5,8 @@
     width: 100vw;
     margin-left: 0 !important;
     margin-right: 0 !important;
-    /* background-image: url(./routes/products/login/login.webp);
-    background-size: cover; */
+    background: rgb(232,48,129);
+    background: linear-gradient(186deg, rgba(232,48,129,1) 0%, rgba(148,187,233,1) 100%);
     display: flex;
     justify-content: center;
     align-items: center;

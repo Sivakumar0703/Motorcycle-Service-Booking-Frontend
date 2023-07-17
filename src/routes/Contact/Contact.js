@@ -1,5 +1,4 @@
 import React from 'react'
-//import Layout from '../../../components/layout/layout'
 import axios from 'axios';
 import * as yup from 'yup'; // for form validation schema
 import { useFormik } from 'formik';
@@ -100,20 +99,12 @@ const Contact = () => {
                         <TextField id="standard-multiline-static" required label="Message" variant="outlined" multiline rows={4} onBlur={handleBlur} fullWidth margin="normal" name="message" value={values.message} onChange={handleChange} />
                         {touched.message && errors.message ? <p style={{ color: "red" }}>{errors.message}</p> : ""}
 
-                        <div className='d-flex' style={{ justifyContent: "center", alignItems: "center" }}> <button className='btn btn-primary mb-3 register-btn' type='submit' onClick={() => console.log('clicked')}> SEND <span> <SendIcon /> </span> </button> </div>
+                        <div className='d-flex' style={{ justifyContent: "center", alignItems: "center" }}> <button className='btn btn-primary mb-3 register-btn' type='submit'> SEND <span> <SendIcon /> </span> </button> </div>
                     </form>
 
                 </div>
-
             </div>
-
-
-
-
-
         </div>
-
-
     )
 }
 

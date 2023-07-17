@@ -15,9 +15,6 @@
 /* stylings for admin price page */
 
 .price-list{
-    /* width:100%;
-    height:100%;
-    margin: auto; */
     display: flex;
     flex-direction: column;
     justify-content: center;

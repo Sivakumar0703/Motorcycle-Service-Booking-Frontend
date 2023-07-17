@@ -1,5 +1,5 @@
 import { TextField } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useState , useEffect } from 'react'
 import '../login/Login.css'
 
 import InputAdornment from '@mui/material/InputAdornment';
@@ -15,8 +15,9 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 
 import axios from 'axios';
-//import { toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import {useNavigate} from 'react-router-dom';
+import { BikeState } from '../../context/Context';
 
 
 
@@ -25,6 +26,7 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const {url} = BikeState();
 
     async function login() {
 
@@ -35,21 +37,15 @@ const Login = () => {
         console.log(user);
 
         try {
-           const result = await axios.post('http://localhost:8080/users/login', user)
+           const result = await axios.post(`${url}/users/login`, user)
             .then(res => { 
                 localStorage.setItem('user',JSON.stringify(res.data.userdata));
                 console.log('res.data : ',res.data.userdata);
                
             })
             if(JSON.parse(localStorage.getItem('user'))){
-                navigate('/nav')
-            }// taking user to landing page
-            
-           // console.log(result)
-            
-    
-           // toast.success('Login successful'); 
-
+                navigate('/')
+            }
 
         } catch (error) {
             console.log('error : ',error.response.data.message)
@@ -59,9 +55,18 @@ const Login = () => {
       
     }
 
+    // aviod user entering into login page after login
+    useEffect(()=>{
+        if(localStorage.getItem('user')){
+            navigate('/');
+            toast.warning('Please Logout for returing Login page')
+        }
+ },[])
+
  
 
-    const [showPassword, setShowPassword] = React.useState(false);
+   // const [showPassword, setShowPassword] = React.useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -72,7 +77,7 @@ const Login = () => {
 
 
     return (
-        <div className='container row login-page col-12'>
+        <div className='row login-page col-12'>
 
 
 
@@ -132,7 +137,7 @@ const Login = () => {
   
                 <a className='no-account' href='/signup'> Don't have an account? click here </a> <br /> 
 
-                <button className='btn btn-primary mb-3' onClick={login} >LOGIN</button>
+                <button className='btn btn-primary mb-3 mt-3' onClick={login} >LOGIN</button>
 
             </div>
 

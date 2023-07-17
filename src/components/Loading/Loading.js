@@ -2,8 +2,6 @@ import React, {useState } from 'react';
 import ScaleLoader from "react-spinners/ScaleLoader";
 
 
-
-
 const Loading = () => {
     let [loading, setLoading] = useState(true);
     let [color, setColor] = useState("#000");

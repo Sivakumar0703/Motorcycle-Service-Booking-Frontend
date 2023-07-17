@@ -1,3 +1,5 @@
+// nav bar to toggle between services
+
 import React from 'react'
 
 const Mininav = () => {
@@ -39,22 +41,7 @@ const Mininav = () => {
         </div>
 
     </nav>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     </div>
   )
 }

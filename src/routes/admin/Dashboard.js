@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import Linechart from '../../components/Chart/Linechart'
 import DoughnutChart from '../../components/Chart/Doughnut'
@@ -7,25 +7,35 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { BikeState } from '../../context/Context';
 import '../admin/Admin.css'
 import Adminnav from './Adminnav';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import Loading from '../../components/Loading/Loading';
 
 const Dashboard = () => {
 
     const [search, setSearch] = useState('');
 
-    const { bikes } = BikeState();
+    const { bikes , url } = BikeState();
+    const navigate = useNavigate();
 
 
     // deleting bike data
     function deleteData(data) {
         const id_number = data._id;
         try {
-            axios.delete(`http://localhost:8080/bikes/delete/${id_number}`)
+            axios.delete(`${url}/bikes/delete/${id_number}`)
             window.location.reload(true)
 
         } catch (error) {
-            console.log('error in deleting bike data', error)
+            toast.error('Deletion Failed')
         }
     }
+
+    useEffect(() => {
+        if(JSON.parse(localStorage.getItem('user')).role !== 'admin'){
+            navigate('/')
+    }
+    },[])
 
 
     return (
@@ -33,17 +43,20 @@ const Dashboard = () => {
             <Adminnav />
             <div className='container'>
 
+            {/* line chart */}
             <div className='linechart'>
-                <p>MONTHLY SERVICE BOOKING RECORD (* all the services are taken into account) </p>
+                <p>MONTH-WISE SERVICE BOOKING RECORD (* all the services are taken into account) </p>
                 <Linechart />
             </div>
 
-
+            {/* Bikes model list that are avilable for serivce */}
             <div className='bike-table'>
                 <p>BIKES AND MODELS THAT ARE AVAILABLE FOR SERVICE/REPAIR IN OUR GARAGE</p>
                 <div className='search-bar'>
                     <input type='search' placeholder='Search here...' value={search} onChange={e => setSearch(e.target.value)} />
                 </div>
+
+               { bikes ? (
                 <Table striped responsive className='mb-3 mt-3 '>
                     <thead>
                         <tr>
@@ -80,34 +93,17 @@ const Dashboard = () => {
 
 
                     </tbody>
-                </Table>
+                </Table> ) : <Loading/> }
             </div>
+                <br/>
+                <br/>
 
-
-
+             {/* Doughnut chart - shows overall service data */}
             <div className='doughnutchart'>
                 <p>FIND MORE ABOUT OUR SERVICE HERE</p>
                 <p>TAKE A LOOK ABOUT OUR SERVICES.EASY TO NOTICE WHICH SERVICE IS NEEDED THE MOST </p>
                 <DoughnutChart />
             </div>
-
-
-
-
-
-            {/* <div className='search-bar'>
-            <h3>SERVICES WE PROVIDE FOR</h3>
-                <input type='search' placeholder='Search here...' value={search} onChange={e => setSearch(e.target.value)} />
-            </div> */}
-
-
-
-
-
-
-
-
-
 
         </div >
         </>

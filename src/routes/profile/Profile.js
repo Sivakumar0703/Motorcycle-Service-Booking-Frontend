@@ -1,120 +1,201 @@
 import React, { useEffect, useState } from 'react'
-import "../profile/Profile.css"
 import Mininav from '../../components/Navigation/Mininav'
 import axios from 'axios'
+import '../profile/Profile.css'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUpload } from '@fortawesome/free-solid-svg-icons';
+import Table from 'react-bootstrap/Table'
+import { BikeState } from '../../context/Context';
+import Footer from '../../components/Footer/Footer';
+import { toast } from 'react-toastify';
+import Loading from '../../components/Loading/Loading';
 
-const Profile = () => {
+const Profilepic = () => {
 
-const[image , setImage] = useState({});
-const[imageName , setImageName] = useState('');
-const[showImage , setShowImage] = useState();
-const url = 'http://localhost:8080/profilepic/uploadImage';
-const email = JSON.parse(localStorage.getItem('user')).email;
-console.log(email)
+  const [image, setImage] = useState();
+  const [showImage, setShowImage] = useState('');
+  const [disable, setDisable] = useState(true);
+  const { users, bookings, url } = BikeState();
+  const [userData, setUserData] = useState();
+  const [booking, setBooking] = useState([])
 
-function handleChange(e){
+  const email = JSON.parse(localStorage.getItem('user')).email;
+
+  function handleChange(e) {
     setImage(e.target.files[0]);
-    console.log('image',e.target.files[0])
-    setImageName(e.target.files[0].name)
-    console.log(e , e.target.files[0].name)
-}
+    console.log('image', e.target.files[0])
+    setDisable(false)
+  }
 
-// const data = {
-//     image: image,
-//     imageName:imageName,
-//     email : email
-// }
+  async function updatePic() {
 
-async function upload(){
     const formData = new FormData()
-    formData.append('file' , image)
-    formData.append('email' , email)
-    formData.append('imageName' , imageName)
-     console.log('sent to backend',formData)
-    await axios.post(url , formData).then(res => console.log('image uploading ',res))
-}
 
 
-useEffect(()=>{
-
-    // async function getImage(){
-
-    //   await  axios.get('http://localhost:8080/profilepic')
-    //     .then(res => {
-    //        setShowImage(res.data.image)
-    //        console.log(res.data.image[0].image.data.data)
-    //     })
-    //     .catch((error) => console.log('show image error' , error))
-
-    // }
-    // getImage();
-   
-    
- 
-   // setShowImage
-
-},[])
+    formData.append('image', image)
+    formData.append('email', email)
+    formData.append('previousImage', showImage)
 
 
+    await axios.put(`${url}/image/update/profile/picture`, formData)
+    window.location.reload();
+  }
 
+  useEffect(() => {
 
+    async function getdata() {
 
+      axios.get(`${url}/image`)
+        .then(res => {
+          setShowImage(res.data.result[0].image)
+        })
+    }
+    getdata();
 
+    users && users.map((item) => {
+      if (item.email === email) {
+        return setUserData(item)
+      }
+    })
 
-
-
-
-
+    bookings && bookings.map((i) => {
+      if (i.email === email) {
+        setBooking((previousData) => [...previousData, i])
+      }
+    })
+  }, [])
 
 
   return (
+
     <div>
 
-<Mininav />
+      <Mininav />
 
-<div className='show-image'>
-    <img src='' alt='profile-picture' />
 
-</div>
+      <div className='user-detail'>
 
-<div className='user-detail'>
-    <div className='profile-pic'>
-        <input type='file' onChange={handleChange} /> <br/>
-        <button onClick={upload}> UPLOAD </button>
+        {/* profile picture */}
+        <div className='profile-picture-container col-12'>
+          <div className='picture col-11 col-md-4'>
+            <img src={`${url}/images/${showImage}`} alt="profile" />
+          </div>
+        </div>
 
-    </div>
 
-    { showImage &&
-        showImage.map((i) => {
-            const result = btoa(
-                String.fromCharCode(...new Uint8Array(i.image.data.data))
-            );
+
+        <div className='user-detail m-3'>
+          <div><p style={{ fontSize: '30px' , fontWeight:'bold' }}>USER DETAIL</p></div>
+
+          {/* user detail  */}
+          {users ? (
+            <Table striped  className='mb-3 mt-3 '>
+            <tbody> 
+              {users && users.map((item) => {
+                if (item.email === email) {
+                  return (
+
+                    <div className='user-container row' key={item._id}>
+                      <div className='user-detail-row col-12 col-md-6'>
+                        <div className='label col-6'><p>USER</p></div>
+                        <div className='label-right col-6'><p>{item.userName}</p></div>
+                      </div>
+
+                      <div className='user-detail-row col-12 col-md-6'>
+                        <div className='label col-6'><p>EMAIL</p></div>
+                        <div className='label-right col-6'><p>{item.email}</p></div>
+                      </div>
+
+                      <div className='user-detail-row col-12 col-md-6'>
+                        <div className='label col-6'><p>MOBILE</p></div>
+                        <div className='label-right col-6'><p>{item.mobile}</p></div>
+                      </div>
+
+                    </div>
+
+                  )
+                }
+              })}
+            </tbody>
+          </Table>
+          ) : <Loading/>}
           
-            console.log(i.image.data.data)
-          return  <img src={`data:image/jpg;base64,${result}`} width="300" key={i._id} />
-        })
-    }
+        </div>
+
+        {/* upload profile picture */}
+        <div className='upload-button m-3'>
+          <div>
+            <p style={{ fontSize: 'larger', fontWeight: 'bold' }}>CHANGE PROFILE PICTURE </p>
+          </div> 
+
+          <div>
+            <input type='file' onChange={handleChange} /> <br />
+            <button onClick={updatePic} className='btn btn-success m-2' disabled={disable}> UPLOAD <span>
+              <FontAwesomeIcon icon={faUpload} />
+            </span>
+            </button>
+          </div>
+
+        </div>
+
+        <p style={{ fontSize: '30px' }} className='m-3'>Your Bookings</p>
 
 
 
+        {/* Previous bookings list */}
+        <div className='m-3'>
+          {
+            bookings ? (
+              bookings.sort(function (a, b) {
+                if (a.serviceDate < b.serviceDate) return -1;
 
-    <div className='profile-detail'></div>
-</div>
+                if (a.serviceDate > b.serviceDate) return 1;
+
+                return 0;
+              })
+                .map((i) => {
+                  if (i.email === email) {
+                    return (
+                      <div className='show-booking' key={i._id}> 
+
+                        <table key={i._id} >
+                          <tbody>
+                            <tr>
+                              <td>SERVICE</td>
+                              <td>: {i.serviceType.toUpperCase()}</td>
+                            </tr>
+
+                            <tr>
+                              <td>BIKE</td>
+                              <td>: {i.bike}</td>
+                            </tr>
+
+                            <tr>
+                              <td>MODEL</td>
+                              <td>: {i.model}</td>
+                            </tr>
+
+                            <tr>
+                              <td>DATE</td>
+                              <td>: {i.serviceDate}</td>
+                            </tr>
 
 
+                          </tbody>
+                        </table>
+                      </div>
+                    )
+                  } 
+                })
+            )  : <Loading/>
+          }
+        </div>
 
-
-
-
-
-
-
-
-
-
+      </div >
+      <Footer />
 
     </div>
   )
 }
 
-export default Profile
+export default Profilepic

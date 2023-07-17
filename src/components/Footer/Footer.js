@@ -1,7 +1,15 @@
 import React from 'react'
 import '../Footer/Footer.css'
+import { useNavigate } from 'react-router-dom'
 
 const Footer = () => {
+
+const navigate = useNavigate();
+
+function gotoContact(){
+    navigate('/contact')
+}
+
     return (
 
 
@@ -39,7 +47,7 @@ const Footer = () => {
             </div>
 
 
-            <div className='company '>
+            <div className='company'>
                 <div className='footer-content'>
                     <h3>COMPANY</h3>
 
@@ -51,9 +59,9 @@ const Footer = () => {
             </div>
 
 
-            <div className='contact '>
+            <div className='contact'>
                 <h3>CONTACT</h3>
-                <button className='btn btn-success'>CLICK HERE</button>
+                <button className='btn btn-success' onClick={gotoContact}>CLICK HERE</button>
             </div>
 
 
