@@ -88,7 +88,7 @@ const Register = () => {
       try {
 
         if ((values.userName && values.email && values.mobile && values.password && values.confirmpassword) !== '') {
-           await axios.post('http://localhost:8080/users/signup', newuser).then((res) =>{ 
+           await axios.post(`${url}/users/signup`, newuser).then((res) =>{ 
             toast.success(res.data.message) ; 
             navigate('/login')
           })
@@ -102,7 +102,7 @@ const Register = () => {
         }
 
       } catch (error) {
-        console.log(error , 'catch')
+        toast.error('try again later')
       }
 
   }
