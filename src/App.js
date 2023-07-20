@@ -14,6 +14,8 @@ import Profile from './routes/profile/Profile';
 import Errorpage from './routes/errorPage/Errorpage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import ResetPassword from './routes/forgotPassword/ResetPassword';
+import PasswordRequest from './routes/forgotPassword/PasswordRequest';
 
 function App() {
   return (
@@ -34,6 +36,8 @@ function App() {
       <Route path='/admin/add/bikes' element={<AdminAddBikes />} />
       <Route path='/admin/dashboard' element={<Dashboard />} />
       <Route path='/contact' element={<Contact />} />
+      <Route path='/reset_password' element={<ResetPassword />} />
+      <Route path='/forgot_password' element={<PasswordRequest />} />
       <Route path='*' element={<Errorpage />} />
  
       </Routes> </BrowserRouter>

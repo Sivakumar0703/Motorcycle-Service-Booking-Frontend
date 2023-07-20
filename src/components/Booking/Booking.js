@@ -179,13 +179,13 @@ const Booking = ({ amount, url_address, serviceType }) => {
         <div className='bookings-form'>
 
             <form onSubmit={handleSubmit} style={{ backgroundColor: 'transparent' }}>
-                <div className='form-filling row'>
-                    <div className='left col-12 col-md-4'>
+                <div className='form-filling row col-12'>
+                    <div className='left col-12 col-md-4' style={{padding:'10px'}}>
 
                         <TextField id="outlined-basic1" required label="USER NAME" onBlur={handleBlur} variant="outlined" fullWidth margin="normal" name="name" value={values.name} onChange={handleChange} />
                         {touched.name && errors.name ? <p className="error-msg" style={{ color: "red" }}>{errors.name}</p> : ""}
 
-                        <TextField id="outlined-basic3" required label="MOBILE NUMBER" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="mobile" value={values.mobile} onChange={handleChange} />
+                        <TextField id="outlined-basic3" required label="MOBILE NUMBER" variant="outlined" onBlur={handleBlur} inputProps={{maxLength:'10'}} fullWidth margin="normal" name="mobile" value={values.mobile} onChange={handleChange} />
                         {touched.mobile && errors.mobile ? <p className="error-msg" style={{ color: "red" }}>{errors.mobile}</p> : ""}
 
                         <TextField id="outlined-basic2" required label="EMAIL" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="email" value={values.email} onChange={handleChange} />
@@ -198,9 +198,9 @@ const Booking = ({ amount, url_address, serviceType }) => {
                         {touched.address2 && errors.address2 ? <p className="error-msg" style={{ color: "red" }}>{errors.address2}</p> : ""}
                     </div>
 
-                    <div className='right col-12 col-md-4'>
+                    <div className='right col-12 col-md-4' style={{margin:'0' , padding:'10px'}}>
 
-                        <TextField id="outlined-basic5" required label="Pincode" variant="outlined" fullWidth margin="normal" name="pincode" value={values.pincode} onChange={handleChange} disabled={!checked} />
+                        <TextField id="outlined-basic5" required label="Pincode" variant="outlined" inputProps={{maxLength:'6'}} fullWidth margin="normal" name="pincode" value={values.pincode} onChange={handleChange} disabled={!checked} />
                         {touched.pincode && errors.pincode ? <p className="error-msg" style={{ color: "red" }}>{errors.pincode}</p> : ""}
 
 

@@ -8,6 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup'; // for form validation schema
 import { useFormik } from 'formik';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUpload } from '@fortawesome/free-solid-svg-icons';
+import { BikeState } from '../../context/Context';
+
 
 
 const registerSchemaValidation = yup.object({
@@ -30,7 +34,10 @@ const registerSchemaValidation = yup.object({
 const Register = () => {
 
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const {url} = BikeState();
+  const [image , setImage] = useState();
+  const [disable , setDisable] = useState(true);
 
 
 
@@ -46,10 +53,32 @@ const Register = () => {
     },
 
     validationSchema: registerSchemaValidation,
-     onSubmit : (newuser) => signup(newuser)
+     onSubmit : (newuser) => {
+      updatePic(newuser.email);
+      signup(newuser)
+    }
   
 
   })
+
+  // upload pic
+  async function updatePic(mail) {
+
+    const formData = new FormData()
+
+
+    formData.append('image', image)
+    formData.append('email', mail)
+
+
+    await axios.post(`${url}/image/upload/image`, formData)
+  }
+
+  function handleChanges(e) {
+    setImage(e.target.files[0]);
+    //console.log('image', e.target.files[0])
+    setDisable(false)
+  }
 
 
 
@@ -59,7 +88,10 @@ const Register = () => {
       try {
 
         if ((values.userName && values.email && values.mobile && values.password && values.confirmpassword) !== '') {
-           await axios.post('http://localhost:8080/users/signup', newuser).then((res) =>{ toast.success(res.data.message) ; navigate('/login')})
+           await axios.post('http://localhost:8080/users/signup', newuser).then((res) =>{ 
+            toast.success(res.data.message) ; 
+            navigate('/login')
+          })
            
            .catch(error => toast.error(error.response.data.message))
           
@@ -110,9 +142,14 @@ const Register = () => {
           {touched.password && errors.password ? <p style={{color:"red"}}>{errors.password}</p> : "" }
 
           <TextField id="outlined-basic5" required label="CONFIRM PASSWORD" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="confirmpassword" value={values.confirmpassword} onChange={handleChange} />
-          {touched.confirmpassword && errors.confirmpassword ? <p style={{color:"red"}}>{errors.confirmpassword}</p> : "" }
+          {touched.confirmpassword && errors.confirmpassword ? <p style={{color:"red"}}>{errors.confirmpassword}</p> : "" } <br/>
 
-          <button className='btn btn-primary mb-3 register-btn' type='submit' onClick={()=>console.log('clicked')} >REGISTER</button> 
+          <div>
+            <p style={{fontWeight:'bold' , display:'inline-block'}}>SELECT PROFILE PICTURE</p> &nbsp; &nbsp; 
+            <input type='file' onChange={handleChanges} required /> <br />
+          </div>
+
+          <button className='btn btn-primary mb-3 register-btn' type='submit'>REGISTER</button> 
 
         </form>
 

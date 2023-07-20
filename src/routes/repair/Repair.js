@@ -43,21 +43,21 @@ const Repair = () => {
 
             <div className='details_and_instructions row '>
                 <div className='instructions col-10 col-md-5'>
-                    <h3> Running Repairs </h3>
-                    <p> We offers the convenience of availing all kinds of repairs at the doorstep </p>
-                    <p>  A lot of times you face nagging issues and you don't really know what's gone wrong or
+                    <h3 className='instructions-text' style={{textAlign:'center'}}> Running Repairs </h3>
+                    <p className='instructions-text'> We offers the convenience of availing all kinds of repairs at the doorstep </p>
+                    <p className='instructions-text'>  A lot of times you face nagging issues and you don't really know what's gone wrong or
                         need a quick spare fix or replacement. In 90% of the cases, you wouldn't know what part
                         or repair is required to fix your problem. We have built the technology
                         and expertise to help you identify the problem and also a probable solution. Our mechanics
                         in 90% cases, resolve the issues in the first visit itself.</p>
 
-                    <p>
+                    <p className='instructions-text'>
                         You can also request for a specific part replacement or specific repair to be performed.
                     </p>
 
-                    <h4>Exceptions:</h4>
+                    <h4 className='instructions-text'>Exceptions:</h4>
 
-                    <p>
+                    <p className='instructions-text'>
                         Any problems relating to your engine or transmission may be required to be inspected at our hub.
                         Worry not! We do pick and drop services at nominal cost.
                     </p>

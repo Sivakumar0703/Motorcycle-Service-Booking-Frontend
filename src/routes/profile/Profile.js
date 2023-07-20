@@ -45,9 +45,13 @@ const Profilepic = () => {
 
     async function getdata() {
 
-      axios.get(`${url}/image`)
+     await axios.get(`${url}/image`)
         .then(res => {
-          setShowImage(res.data.result[0].image)
+          res.data.result && res.data.result.map((i) => {
+            if(i.email === email){
+              setShowImage(i.image)
+            }
+          })
         })
     }
     getdata();
@@ -78,7 +82,7 @@ const Profilepic = () => {
         {/* profile picture */}
         <div className='profile-picture-container col-12'>
           <div className='picture col-11 col-md-4'>
-            <img src={`${url}/images/${showImage}`} alt="profile" />
+            <img src={`${url}/images/${showImage}`} alt="profile"  />
           </div>
         </div>
 
@@ -98,7 +102,7 @@ const Profilepic = () => {
                     <div className='user-container row' key={item._id}>
                       <div className='user-detail-row col-12 col-md-6'>
                         <div className='label col-6'><p>USER</p></div>
-                        <div className='label-right col-6'><p>{item.userName}</p></div>
+                        <div className='label-right col-6'><p>{item.userName.toUpperCase()}</p></div>
                       </div>
 
                       <div className='user-detail-row col-12 col-md-6'>

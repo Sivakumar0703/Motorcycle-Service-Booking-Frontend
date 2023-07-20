@@ -208,9 +208,9 @@ const Services = () => {
             <div className='booking-form  '>
                 <div className='bike-details ' > <form onSubmit={booknow}>
                     <h2> Bike Details </h2>
-                    <div className='bike-detail-feilds mb-2'> <input className='input' placeholder='Name' value={name} onChange={e => setName(e.target.value)} required /> </div>
-                    <div className='bike-detail-feilds mb-2'> <input type="tel" name="mobile" pattern="[0-9]{10}" title='please enter 10 digit mobile number' className='input' placeholder='mobile' value={mobile} onChange={e => setMobile(e.target.value)} required /> </div>
-                    <div className='bike-detail-feilds mb-2'> <input className='input' placeholder='Bike Registration Number' value={register} onChange={e => setRegister(e.target.value)} required /> </div>
+                    <div className='bike-detail-feilds mb-2'> <input className='input' type='text' pattern='[A-Za-z]{1,15}' title="Name must have atleast 3 characters(only alphabets)" placeholder='Name' value={name}  onChange={e => setName(e.target.value)} required /> </div>
+                    <div className='bike-detail-feilds mb-2'> <input type="number" name="mobile" pattern="[0-9]{10}" title='please enter 10 digit mobile number' className='input' placeholder='mobile' value={mobile} onChange={e => setMobile(e.target.value)} required /> </div>
+                    <div className='bike-detail-feilds mb-2'> <input className='input' placeholder='Bike Registration Number'  value={register} onChange={e => setRegister(e.target.value)} required /> </div>
                     <div className='bike-detail-feilds mb-2'> <select placeholder='Select Bike Company' onChange={e => setBike(e.target.value)} required>
                         <option value=''> Select Bike  </option>
                         {brand.map((i) => <option value={i} key={i._id} > {i} </option>)}

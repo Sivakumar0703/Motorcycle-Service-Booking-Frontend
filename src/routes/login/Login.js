@@ -34,22 +34,20 @@ const Login = () => {
             email,
             password,
         }
-        console.log(user);
+        
 
         try {
            const result = await axios.post(`${url}/users/login`, user)
             .then(res => { 
-                localStorage.setItem('user',JSON.stringify(res.data.userdata));
-                console.log('res.data : ',res.data.userdata);
-               
+                localStorage.setItem('user',JSON.stringify(res.data.userdata));  
             })
+            .catch(error => toast.error(error.response.data.message))
             if(JSON.parse(localStorage.getItem('user'))){
                 navigate('/')
             }
 
         } catch (error) {
-            console.log('error : ',error.response.data.message)
-           //  toast.error(error.response.data.message)
+             toast.error(error.response.data.message)
         }
 
       
@@ -133,8 +131,8 @@ const Login = () => {
 
                 </Box>
 
+                <a className='forgotPassword' href='/forgot_password'> Forgot Password?  </a> <br/>
                 
-  
                 <a className='no-account' href='/signup'> Don't have an account? click here </a> <br /> 
 
                 <button className='btn btn-primary mb-3 mt-3' onClick={login} >LOGIN</button>

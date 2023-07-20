@@ -78,3 +78,9 @@ font-weight: bold;
     padding:15px;
 }
 
+.forgotPassword{
+    display: block;
+    text-decoration: none;
+    text-align: right;
+   
+}
