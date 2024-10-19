@@ -25,6 +25,7 @@ const Login = () => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [triggerLogin , setTriggerLogin] = useState(false);
     const navigate = useNavigate();
     const {url} = BikeState();
 
@@ -52,6 +53,20 @@ const Login = () => {
 
       
     }
+
+    function demoLogin(guestEmail){
+        setEmail(guestEmail);
+        setPassword('sivakumar');
+        setTriggerLogin(true);
+    }
+
+    useEffect(()=>{
+        if(triggerLogin){
+            login();
+            setTriggerLogin(false);
+        }
+
+    },[triggerLogin])
 
     // aviod user entering into login page after login
     useEffect(()=>{
@@ -133,9 +148,13 @@ const Login = () => {
 
                 <a className='forgotPassword' href='/forgot_password'> Forgot Password?  </a> <br/>
                 
-                <a className='no-account' href='/signup'> Don't have an account? click here </a> <br /> 
+                <a className='no-account ml-2' href='/signup'> Don't have an account? click here </a> <br /> 
 
+                <div className='btn-group'>
                 <button className='btn btn-primary mb-3 mt-3' onClick={login} >LOGIN</button>
+                <button className='btn btn-danger mb-3 mt-3' onClick={() => demoLogin('admin@moto.com')} >ADMIN</button>
+                <button className='btn btn-success mb-3 mt-3' onClick={() => demoLogin('guest@moto.com')} >GUEST</button>
+                </div>
 
             </div>
 

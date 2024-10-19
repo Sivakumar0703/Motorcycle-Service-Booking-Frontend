@@ -138,10 +138,10 @@ const Register = () => {
           <TextField id="outlined-basic3" required label="MOBILE NUMBER" variant="outlined"  onBlur={handleBlur} fullWidth margin="normal" name="mobile" value={values.mobile} onChange={handleChange} /> <br />
           {touched.mobile && errors.mobile ? <p style={{color:"red"}}>{errors.mobile}</p> : "" }
 
-          <TextField id="outlined-basic4" required label="PASSWORD" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="password" value={values.password} onChange={handleChange} /> <br />
+          <TextField id="outlined-basic4" type='password' required label="PASSWORD" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="password" value={values.password} onChange={handleChange} /> <br />
           {touched.password && errors.password ? <p style={{color:"red"}}>{errors.password}</p> : "" }
 
-          <TextField id="outlined-basic5" required label="CONFIRM PASSWORD" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="confirmpassword" value={values.confirmpassword} onChange={handleChange} />
+          <TextField id="outlined-basic5" type='password' required label="CONFIRM PASSWORD" variant="outlined" onBlur={handleBlur} fullWidth margin="normal" name="confirmpassword" value={values.confirmpassword} onChange={handleChange} />
           {touched.confirmpassword && errors.confirmpassword ? <p style={{color:"red"}}>{errors.confirmpassword}</p> : "" } <br/>
 
           <div>
